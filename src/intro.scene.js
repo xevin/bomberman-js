@@ -9,10 +9,6 @@ export class IntroScene extends Phaser.Scene {
 
   preload() {
     this.load.image("intro", "assets/intro.png")
-    this.load.spritesheet("dude", "assets/dude.png", {
-      frameWidth: 32,
-      frameHeight: 32
-    })
   }
 
   create() {
@@ -26,6 +22,10 @@ export class IntroScene extends Phaser.Scene {
       fontSize: 20,
       fontFamily: "monospace",
       color: "#3CA370 "
+    })
+
+    this.input.keyboard.on("keyup", () => {
+      this.scene.start("GameScene")
     })
   }
 
@@ -42,10 +42,5 @@ export class IntroScene extends Phaser.Scene {
         this.isBlinked = true
       }
     }
-
-
-    this.input.keyboard.on("keydown", () => {
-      this.scene.start("GameScene")
-    })
   }
 }
