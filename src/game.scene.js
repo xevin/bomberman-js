@@ -16,7 +16,7 @@ export class GameScene extends Phaser.Scene {
 
   preload() {
     this.load.spritesheet("dude", "assets/dude.png", FrameConfig)
-    this.load.spritesheet("bomb", "assets/bomb.png", FrameConfig)
+    this.load.spritesheet("bomb", "assets/bomb-frames.png", FrameConfig)
     this.load.spritesheet("blast", "assets/blast-frames.png", FrameConfig)
   }
 
@@ -123,6 +123,7 @@ export class GameScene extends Phaser.Scene {
 
     crossBlast.startTime = currentTime
     crossBlast.anims.play("blast-cross")
+    this.physics.add.overlap(this.player, crossBlast, this.collidePlayerWithBlast)
     this.blasts.push(crossBlast)
 
     const dirs = [
@@ -148,9 +149,37 @@ export class GameScene extends Phaser.Scene {
 
         newBlast.anims.play(i === size ? "blast-tail" : "blast-body")
         newBlast.startTime = currentTime
+        this.physics.add.overlap(this.player, newBlast, this.collidePlayerWithBlast)
+
+        // навешиваем коллбэк при столкновении взрыва и бомбы
+        this.bombs.children.entries.forEach(bomb => {
+          this.physics.add.overlap(bomb, newBlast, this.explodeBomb, () => true, this)
+        })
+
         this.blasts.push(newBlast)
       })
     }
+  }
+
+  collidePlayerWithBlast() {
+    console.info("player is dead")
+  }
+
+  explodeBomb(bomb, { startTime }) {
+    this.drawBlast(
+      {
+        x: bomb.x,
+        y: bomb.y
+      },
+      this.player.blastSize,
+      startTime
+    )
+
+    // бомба отработала и больше не нужна
+    bomb.destroy()
+
+    // возвращаем игроку возможность ставить бомбу
+    this.player.availableBombCount += 1
   }
 
   update(time, delta) {
@@ -209,23 +238,10 @@ export class GameScene extends Phaser.Scene {
       }
     })
 
+    const self = this
     this.bombs.children.entries.forEach(bomb => {
       if (time - bomb.startTime > 3000) {
-        // начинаем взрыв
-        this.drawBlast(
-          {
-            x: bomb.x,
-            y: bomb.y
-          },
-          this.player.blastSize,
-          time
-        )
-
-        // бомба отработала и больше не нужна
-        bomb.destroy()
-
-        // возвращаем игроку возможность ставить бомбу
-        this.player.availableBombCount += 1
+        self.explodeBomb(bomb, { startTime: time })
       }
     })
   }
