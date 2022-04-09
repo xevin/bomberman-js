@@ -1,6 +1,7 @@
 import Phaser from "phaser"
 import { IntroScene } from "./intro.scene"
 import { GameScene } from "./game.scene"
+import { MenuScene } from "./menu.scene"
 
 const SCREEN = {
   width: 240,
@@ -11,7 +12,7 @@ let config = {
   type: Phaser.AUTO,
   width: SCREEN.width * 2,
   height: SCREEN.height * 2,
-  scene: [ IntroScene, GameScene ],
+  scene: [ IntroScene, MenuScene, GameScene],
   backgroundColor: "#43434F",
   physics: {
     default: "arcade",
