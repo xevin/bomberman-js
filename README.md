@@ -1,6 +1,6 @@
 # Bomberman JS
 
-Игра бомбермен на phaser v3
+Игра бомбермен на phaser v3 [Demo](https://xevin.github.io/bomberman-js/)
 
 
 ## Как поднимать проект
