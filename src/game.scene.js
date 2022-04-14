@@ -140,11 +140,11 @@ export class GameScene extends Phaser.Scene {
         const newBlast = this.physics.add.sprite(x, y)
 
         if (dir === Phaser.Math.Vector2.UP) {
-          newBlast.body.rotation = 270
+          newBlast.setRotation(Phaser.Math.DegToRad(270))
         } else if (dir === Phaser.Math.Vector2.DOWN) {
-          newBlast.body.rotation = 90
+          newBlast.setRotation(Phaser.Math.DegToRad(90))
         } else if (i === size && dir === Phaser.Math.Vector2.LEFT) {
-          newBlast.body.rotation = 180
+          newBlast.setRotation(Phaser.Math.DegToRad(180))
         }
 
         newBlast.anims.play(i === size ? "blast-tail" : "blast-body")
