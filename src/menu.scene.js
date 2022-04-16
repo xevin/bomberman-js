@@ -2,7 +2,7 @@ import {FrameConfig} from "./constants"
 
 export class MenuScene extends Phaser.Scene {
 
-  bomb = null
+  arrow = null
   currentItemIndex = 0
 
   config = {
@@ -21,18 +21,12 @@ export class MenuScene extends Phaser.Scene {
     {
       scene: 'GameScene',
       text: 'Новая игра',
-      current: true,
     },
     {
       scene: 'MenuOptionsScene',
       text: 'Опции',
-      current: false,
     },
   ]
-
-  findCurrentMenuIndex() {
-   return this.menuItems.findIndex((item) => item.current)
-  }
 
   constructor() {
     super("MenuScene")
@@ -52,9 +46,6 @@ export class MenuScene extends Phaser.Scene {
     }
 
   create() {
-    //this.bomb = this.add.image(130, 205,"menu-arrow")
-    //this.bomb.setDisplaySize(25, 25)
-
     this.arrow = this.physics.add.sprite(
         this.config.startX - 40,
         this.config.startY,
@@ -70,21 +61,14 @@ export class MenuScene extends Phaser.Scene {
 
     this.input.keyboard.on('keydown-ENTER', () => {
       this.scene.start(this.menuItems[this.currentItemIndex].scene)
-      //this.scene.start("GameScene")
     })
 
     this.input.keyboard.on('keydown-UP', () => {
-      this.currentItemIndex = this.findCurrentMenuIndex()
-      this.menuItems[this.currentItemIndex].current = false
       this.currentItemIndex === 0 ? this.currentItemIndex = this.menuItems.length - 1 : this.currentItemIndex--
-      this.menuItems[this.currentItemIndex].current = true
     })
 
     this.input.keyboard.on('keydown-DOWN', () => {
-      this.currentItemIndex = this.findCurrentMenuIndex()
-      this.menuItems[this.currentItemIndex].current = false
       this.currentItemIndex === this.menuItems.length - 1 ? this.currentItemIndex = 0 : this.currentItemIndex++
-      this.menuItems[this.currentItemIndex].current = true
     })
     this.createAnimations()
   }
