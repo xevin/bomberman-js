@@ -25,7 +25,7 @@ export class IntroScene extends Phaser.Scene {
     })
 
     this.input.keyboard.on("keyup", () => {
-      this.scene.start("GameScene")
+      this.scene.start("MenuScene")
     })
   }
 
