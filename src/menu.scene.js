@@ -1,3 +1,5 @@
+import {FrameConfig} from "./constants"
+
 export class MenuScene extends Phaser.Scene {
 
   bomb = null
@@ -9,46 +11,55 @@ export class MenuScene extends Phaser.Scene {
     lastY: null,
     incrementY: 40,
     style: {
-      fontSize: 24,
+      fontSize: 22,
       fontFamily: "monospace",
-      color: "#b94200"
+      color: "#21cb07"
     }
   }
   
   menuItems = [
     {
-      name: 'newGame',
+      scene: 'GameScene',
       text: 'Новая игра',
-      position: 1,
       current: true,
     },
     {
-      name: 'options',
+      scene: 'MenuOptionsScene',
       text: 'Опции',
-      position: 2,
       current: false,
     },
-    {
-      name: 'about',
-      text: 'Об игре',
-      position: 3,
-      current: false,
-    }
   ]
+
+  findCurrentMenuIndex() {
+   return this.menuItems.findIndex((item) => item.current)
+  }
 
   constructor() {
     super("MenuScene")
   }
 
   preload() {
-    this.load.image("menu-bomb", "assets/menu_assets/bomb.png")
+    this.load.spritesheet("menu-arrow", "assets/menu_assets/arrow.png", FrameConfig)
   }
 
-  create() {
-    this.bomb = this.add.image(130, 205,"menu-bomb")
-    this.bomb.setDisplaySize(30, 30)
-    this.cursors = this.input.keyboard.createCursorKeys()
+  createAnimations() {
+    this.anims.create({
+      key: "arrow",
+      frames: this.anims.generateFrameNumbers("menu-arrow", {start: 0, end: 3}),
+      frameRate: 12,
+        repeat: -1
+    })
+    }
 
+  create() {
+    //this.bomb = this.add.image(130, 205,"menu-arrow")
+    //this.bomb.setDisplaySize(25, 25)
+
+    this.arrow = this.physics.add.sprite(
+        this.config.startX - 40,
+        this.config.startY,
+        "menu-arrow"
+    )
     //* вывожу пункты меню в сцену
     this.menuItems.forEach( (item, index) => {
       item.textObj = this.add.text(this.config.startX, index ? this.config.lastY + this.config.incrementY : this.config.startY, item.text, this.config.style)
@@ -58,30 +69,28 @@ export class MenuScene extends Phaser.Scene {
     })
 
     this.input.keyboard.on('keydown-ENTER', () => {
-      this.scene.start("GameScene")
+      this.scene.start(this.menuItems[this.currentItemIndex].scene)
+      //this.scene.start("GameScene")
     })
 
     this.input.keyboard.on('keydown-UP', () => {
-      this.currentItemIndex = this.menuItems.findIndex((item) => item.current)
+      this.currentItemIndex = this.findCurrentMenuIndex()
       this.menuItems[this.currentItemIndex].current = false
-
       this.currentItemIndex === 0 ? this.currentItemIndex = this.menuItems.length - 1 : this.currentItemIndex--
-
       this.menuItems[this.currentItemIndex].current = true
     })
 
     this.input.keyboard.on('keydown-DOWN', () => {
-      this.currentItemIndex = this.menuItems.findIndex((item, index, arr) => item.current)
+      this.currentItemIndex = this.findCurrentMenuIndex()
       this.menuItems[this.currentItemIndex].current = false
-
       this.currentItemIndex === this.menuItems.length - 1 ? this.currentItemIndex = 0 : this.currentItemIndex++
       this.menuItems[this.currentItemIndex].current = true
-
     })
-
+    this.createAnimations()
   }
 
-  update() {
-    this.bomb.setY(this.menuItems[this.currentItemIndex].textObj.y + 5)
+  update(time, delta) {
+    this.arrow.anims.play("arrow", true)
+    this.arrow.setY(this.menuItems[this.currentItemIndex].textObj.y + 15)
   }
 }
