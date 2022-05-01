@@ -1,5 +1,5 @@
 import Phaser from "phaser"
-import { SCREEN, UiColor } from "./constants"
+import { SCREEN, UI_COLOR } from "./constants"
 import { IntroScene } from "./intro.scene"
 import { GameScene } from "./game.scene"
 import { MenuScene } from "./menu.scene"
@@ -11,7 +11,7 @@ let config = {
   width: SCREEN.width,
   height: SCREEN.height,
   scene: [ IntroScene, MenuScene, MenuOptionsScene, GameScene],
-  backgroundColor: UiColor.background,
+  backgroundColor: UI_COLOR.background,
   physics: {
     default: "arcade",
     arcade: {

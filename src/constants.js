@@ -6,19 +6,19 @@ export const SCREEN = {
   height: TILE_H * 15
 }
 
-export const FrameConfig = {
+export const FRAME_CONFIG = {
   frameWidth: TILE_W,
   frameHeight: TILE_H
 }
 
-export const FontSize = {
+export const FONT_SIZE = {
   // размеры подобраны под шрифт NewGen
   normal: "18px",
   big: "27px",
   large: "36px"
 }
 
-export const UiColor = {
+export const UI_COLOR = {
   normalText: "#F1F1F1",
   inactiveMenuItem: "#3CA370",
   activeMenuItem: "#CFFF70",

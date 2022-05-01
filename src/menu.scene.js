@@ -1,4 +1,4 @@
-import { FrameConfig, UiColor } from "./constants"
+import { FRAME_CONFIG, UI_COLOR } from "./constants"
 
 export class MenuScene extends Phaser.Scene {
 
@@ -13,7 +13,7 @@ export class MenuScene extends Phaser.Scene {
     style: {
       fontSize: 18,
       fontFamily: "NewGen",
-      color: UiColor.activeMenuItem
+      color: UI_COLOR.activeMenuItem
     }
   }
 
@@ -33,7 +33,7 @@ export class MenuScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.spritesheet("menu-arrow", "assets/menu_assets/arrow.png", FrameConfig)
+    this.load.spritesheet("menu-arrow", "assets/menu_assets/arrow.png", FRAME_CONFIG)
   }
 
   createAnimations() {
@@ -54,7 +54,7 @@ export class MenuScene extends Phaser.Scene {
     //* вывожу пункты меню в сцену
     this.menuItems.forEach( (item, index) => {
       item.textObj = this.add.text(this.config.startX, index ? this.config.lastY + this.config.incrementY : this.config.startY, item.text, this.config.style)
-      item.textObj.setShadow(2,3,UiColor.textShadow,1,true,true)
+      item.textObj.setShadow(2,3,UI_COLOR.textShadow,1,true,true)
       this.config.lastY = item.textObj.y
 
     })

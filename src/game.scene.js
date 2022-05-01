@@ -1,4 +1,4 @@
-import { TILE_W, TILE_H, FrameConfig } from "./constants"
+import { TILE_W, TILE_H, FRAME_CONFIG } from "./constants"
 
 export class GameScene extends Phaser.Scene {
   fireKey = null
@@ -15,9 +15,9 @@ export class GameScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.spritesheet("dude", "assets/dude.png", FrameConfig)
-    this.load.spritesheet("bomb", "assets/bomb-frames.png", FrameConfig)
-    this.load.spritesheet("blast", "assets/blast-frames.png", FrameConfig)
+    this.load.spritesheet("dude", "assets/dude.png", FRAME_CONFIG)
+    this.load.spritesheet("bomb", "assets/bomb-frames.png", FRAME_CONFIG)
+    this.load.spritesheet("blast", "assets/blast-frames.png", FRAME_CONFIG)
   }
 
   createAnimations() {
