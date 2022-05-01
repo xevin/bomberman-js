@@ -1,6 +1,11 @@
 export const TILE_W = 32
 export const TILE_H = 32
 
+export const SCREEN = {
+  width: 240,
+  height: 240
+}
+
 export const FrameConfig = {
   frameWidth: TILE_W,
   frameHeight: TILE_H

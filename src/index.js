@@ -1,13 +1,11 @@
 import Phaser from "phaser"
+import { SCREEN } from "./constants"
 import { IntroScene } from "./intro.scene"
 import { GameScene } from "./game.scene"
 import { MenuScene } from "./menu.scene"
-import {MenuOptionsScene} from "./menu-options.scene"
+import { MenuOptionsScene } from "./menu-options.scene"
 
-const SCREEN = {
-  width: 240,
-  height: 240
-}
+
 
 let config = {
   type: Phaser.AUTO,
