@@ -1,3 +1,5 @@
+import { FontSize, UiColor } from "./constants"
+
 export class MenuOptionsScene extends Phaser.Scene {
 
     constructor() {
@@ -9,11 +11,11 @@ export class MenuOptionsScene extends Phaser.Scene {
     }
 
     create() {
-        this.add.text(120, 200, 'Опции в разработке', {
-            fontSize: 22,
-            fontFamily: "monospace",
-            color: "#58ee38"
-        }).setShadow(2,3,'rgb(30,30,30)',1,true,true)
+        this.add.text(90, 200, 'Опции в разработке', {
+            fontSize: FontSize.big,
+            fontFamily: "NewGen",
+            color: UiColor.activeMenuItem
+        }).setShadow(2,3,UiColor.textShadow,1,true,true)
 
         this.input.keyboard.on('keydown-ESC', () => {
             this.scene.start("MenuScene")

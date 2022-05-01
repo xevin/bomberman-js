@@ -3,16 +3,23 @@
   <head>
     <title>Another Bomberman clone</title>
     <meta charset="UTF-8" />
+    <link rel="preload" as="font" href="src/assets/new-gen.ttf" type="font/ttf" />
     <style>
-      canvas {
-        transform-origin: top left;
-        transform: scale(1.5)
+      @font-face {
+        font-family: NewGen;
+        src: url("src/assets/new-gen.ttf");
+      }
+
+      #font-loader-hack {
+        font-family: "NewGen", monospace;
+        visibility: hidden;
+        position: absolute;
       }
     </style>
   </head>
 
   <body>
-    <div id="app"></div>
+    <div id="font-load-hack">.</div>
     <script src="src/index.js"></script>
   </body>
 </html>

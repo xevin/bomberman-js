@@ -1,4 +1,4 @@
-import {FrameConfig} from "./constants"
+import { FrameConfig, UiColor } from "./constants"
 
 export class MenuScene extends Phaser.Scene {
 
@@ -11,12 +11,12 @@ export class MenuScene extends Phaser.Scene {
     lastY: null,
     incrementY: 40,
     style: {
-      fontSize: 22,
-      fontFamily: "monospace",
-      color: "#21cb07"
+      fontSize: 18,
+      fontFamily: "NewGen",
+      color: UiColor.activeMenuItem
     }
   }
-  
+
   menuItems = [
     {
       scene: 'GameScene',
@@ -54,9 +54,9 @@ export class MenuScene extends Phaser.Scene {
     //* вывожу пункты меню в сцену
     this.menuItems.forEach( (item, index) => {
       item.textObj = this.add.text(this.config.startX, index ? this.config.lastY + this.config.incrementY : this.config.startY, item.text, this.config.style)
-      item.textObj.setShadow(2,3,'rgb(30,30,30)',1,true,true)
+      item.textObj.setShadow(2,3,UiColor.textShadow,1,true,true)
       this.config.lastY = item.textObj.y
-      
+
     })
 
     this.input.keyboard.on('keydown-ENTER', () => {

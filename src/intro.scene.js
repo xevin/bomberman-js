@@ -1,3 +1,5 @@
+import { FontSize, UiColor } from "./constants"
+
 export class IntroScene extends Phaser.Scene {
   pressAnyKeyText = null
   blinkTimer = 0
@@ -13,16 +15,18 @@ export class IntroScene extends Phaser.Scene {
 
   create() {
     this.add.sprite(240, 344,"intro")
-    this.add.text(140, 50, "Бомбические\nподземелья", {
-      fontSize: 28,
+    this.add.text(142, 50, "Бомбические\nподземелья", {
+      fontSize: FontSize.big,
+      fontFamily: "NewGen",
       align: "center",
-      fontFamily: "monospace"
+      color: UiColor.normalText
     })
-    this.pressAnyKeyText = this.add.text(132, 200, "Нажми любую кнопку", {
-      fontSize: 20,
-      fontFamily: "monospace",
-      color: "#3CA370 "
-    })
+
+    this.pressAnyKeyText = this.add.text(140, 200, "Нажми любую кнопку", {
+      fontSize: FontSize.normal,
+      fontFamily: "NewGen",
+      color: UiColor.activeMenuItem
+    }).setShadow(2,3,UiColor.textShadow,1,true,true)
 
     this.input.keyboard.on("keyup", () => {
       this.scene.start("MenuScene")
@@ -35,10 +39,10 @@ export class IntroScene extends Phaser.Scene {
     } else {
       this.blinkTimer = 0
       if (this.isBlinked) {
-        this.pressAnyKeyText.setColor("#3CA370")
+        this.pressAnyKeyText.setColor(UiColor.activeMenuItem)
         this.isBlinked = false
       } else {
-        this.pressAnyKeyText.setColor("#CFFF70")
+        this.pressAnyKeyText.setColor(UiColor.inactiveMenuItem)
         this.isBlinked = true
       }
     }
