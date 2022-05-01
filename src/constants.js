@@ -2,8 +2,8 @@ export const TILE_W = 32
 export const TILE_H = 32
 
 export const SCREEN = {
-  width: 240,
-  height: 240
+  width: TILE_W * 15,
+  height: TILE_H * 15
 }
 
 export const FrameConfig = {
@@ -22,5 +22,6 @@ export const UiColor = {
   normalText: "#F1F1F1",
   inactiveMenuItem: "#3CA370",
   activeMenuItem: "#CFFF70",
-  textShadow: "#1E1E1E"
+  textShadow: "#1E1E1E",
+  background: "#43434F"
 }
