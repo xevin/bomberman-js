@@ -10,7 +10,12 @@ let config = {
   type: Phaser.AUTO,
   width: SCREEN.width,
   height: SCREEN.height,
-  scene: [ IntroScene, MenuScene, MenuOptionsScene, GameScene],
+  scene: [
+    IntroScene,
+    MenuScene,
+    MenuOptionsScene,
+    GameScene
+  ],
   backgroundColor: UI_COLOR.background,
   physics: {
     default: "arcade",
@@ -21,4 +26,5 @@ let config = {
   pixelArt: true
 }
 
+document.body.style.backgroundColor = UI_COLOR.background
 let game = new Phaser.Game(config)

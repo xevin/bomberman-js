@@ -1,10 +1,11 @@
-import { TILE_W, TILE_H, FRAME_CONFIG } from "./constants"
+import { TILE_W, TILE_H, FRAME_CONFIG, SCREEN } from "./constants"
 
 export class GameScene extends Phaser.Scene {
   fireKey = null
-  cusrors = null
+  cursors = null
   player = null
   bombs = null
+  walls = null
   blasts = []
   playerSpeed = 120
   isHMoves = false // движение только по горизонтали
@@ -18,6 +19,7 @@ export class GameScene extends Phaser.Scene {
     this.load.spritesheet("dude", "assets/dude.png", FRAME_CONFIG)
     this.load.spritesheet("bomb", "assets/bomb-frames.png", FRAME_CONFIG)
     this.load.spritesheet("blast", "assets/blast-frames.png", FRAME_CONFIG)
+    this.load.spritesheet("walls", "assets/walls.png", FRAME_CONFIG)
   }
 
   createAnimations() {
@@ -82,6 +84,35 @@ export class GameScene extends Phaser.Scene {
     })
   }
 
+  drawWalls() {
+    this.walls = this.physics.add.staticGroup()
+    this.physics.add.collider(this.player, this.walls)
+
+    const offset = TILE_W/2
+    const bottomCoord = SCREEN.height - TILE_H
+    const rightCoord = SCREEN.width - TILE_W
+
+    // верхняя и нижняя стены
+    for(let i=(SCREEN.width/TILE_W)-2; i > 0; i--) {
+      const x = i * TILE_W + offset
+      this.walls.create(x, offset, "walls", 1)
+      this.walls.create(x, bottomCoord + offset, "walls", 13)
+    }
+
+    // левая и правая стены
+    for(let i=(SCREEN.height/TILE_H)-2; i > 0; i--) {
+      const y = i * TILE_H + offset
+      this.walls.create(offset, y, "walls", 6)
+      this.walls.create(rightCoord + offset, y, "walls", 8)
+    }
+
+    // Расставляем углы
+    this.walls.create(offset, offset, "walls", 0)
+    this.walls.create(rightCoord + offset, offset, "walls", 2)
+    this.walls.create(offset, bottomCoord + offset, "walls", 12)
+    this.walls.create(rightCoord + offset, bottomCoord + offset, "walls", 14)
+  }
+
   create() {
     this.player = this.physics.add.sprite(
       TILE_W*4,
@@ -103,6 +134,7 @@ export class GameScene extends Phaser.Scene {
     this.fireKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE)
 
     this.createAnimations()
+    this.drawWalls()
   }
 
   spawnBomb(placeTime, position) {
