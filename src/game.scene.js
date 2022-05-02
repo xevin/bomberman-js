@@ -95,11 +95,12 @@ export class GameScene extends Phaser.Scene {
     const R_WALL = 8
     const B_WALL = 13
     const COLUMN = 7
+    const BRICK_WALL = 3
 
     this.walls = this.physics.add.staticGroup()
     this.physics.add.collider(this.player, this.walls)
 
-    // Часть I
+    // Часть I - стены вокруг уровня
     const bottomCoord = SCREEN.height - TILE_H
     const rightCoord = SCREEN.width - TILE_W
 
@@ -123,7 +124,7 @@ export class GameScene extends Phaser.Scene {
     this.walls.create(TILE_OFFSET, bottomCoord + TILE_OFFSET, "walls", BL_CORNER)
     this.walls.create(rightCoord + TILE_OFFSET, bottomCoord + TILE_OFFSET, "walls", BR_CORNER)
 
-    // Часть II
+    // Часть II - нерушимые колонны
     const w_count = ((SCREEN.width / TILE_W) - 4) / 2
     const h_count = ((SCREEN.height / TILE_H) - 4) / 2
 
@@ -135,6 +136,10 @@ export class GameScene extends Phaser.Scene {
         this.walls.create(x, y, "walls", COLUMN).body.setCircle(TILE_W/2)
       }
     }
+
+    // Часть III - кирпичная кладка
+    // TODO генерировать случайное кол-во и случайное расположение кирпичей
+    this.walls.create(TILE_W * 3 + TILE_OFFSET, TILE_W * 4 + TILE_OFFSET, "walls", BRICK_WALL).body.setCircle(TILE_W/2)
   }
 
   create() {
