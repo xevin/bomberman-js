@@ -107,15 +107,15 @@ export class GameScene extends Phaser.Scene {
     // верхняя и нижняя стены
     for(let i=(SCREEN.width/TILE_W)-2; i > 0; i--) {
       const x = i * TILE_W + TILE_OFFSET
-      this.walls.create(x, TILE_OFFSET, "walls", T_WALL)
-      this.walls.create(x, bottomCoord + TILE_OFFSET, "walls", B_WALL)
+      this.walls.create(x, TILE_OFFSET, "walls", T_WALL).setDepth(1)
+      this.walls.create(x, bottomCoord + TILE_OFFSET, "walls", B_WALL).setDepth(1)
     }
 
     // левая и правая стены
     for(let i=(SCREEN.height/TILE_H)-2; i > 0; i--) {
       const y = i * TILE_H + TILE_OFFSET
-      this.walls.create(TILE_OFFSET, y, "walls", L_WALL)
-      this.walls.create(rightCoord + TILE_OFFSET, y, "walls", R_WALL)
+      this.walls.create(TILE_OFFSET, y, "walls", L_WALL).setDepth(1)
+      this.walls.create(rightCoord + TILE_OFFSET, y, "walls", R_WALL).setDepth(1)
     }
 
     // Расставляем углы
@@ -133,7 +133,7 @@ export class GameScene extends Phaser.Scene {
 
       for (let j=0; j < h_count; j++) {
         const y = TILE_OFFSET + (j+1) * (TILE_H * 2)
-        this.walls.create(x, y, "walls", COLUMN).body.setCircle(TILE_W/2)
+        this.walls.create(x, y, "walls", COLUMN).setDepth(1).body.setCircle(TILE_W/2)
       }
     }
 
