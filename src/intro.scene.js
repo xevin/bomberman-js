@@ -14,7 +14,7 @@ export class IntroScene extends Phaser.Scene {
   }
 
   create() {
-    this.add.sprite(240, 344,"intro")
+    this.add.sprite(240, 344,"intro").setScale(3)
     this.add.text(142, 50, "Бомбические\nподземелья", {
       fontSize: FONT_SIZE.big,
       fontFamily: "NewGen",
