@@ -1,4 +1,4 @@
-import { TILE_W, TILE_H, FRAME_CONFIG, SCREEN } from "./constants"
+import { TILE_W, TILE_H, FRAME_CONFIG, SCREEN, TILE_OFFSET } from "./constants"
 
 export class GameScene extends Phaser.Scene {
   fireKey = null
@@ -85,38 +85,62 @@ export class GameScene extends Phaser.Scene {
   }
 
   drawWalls() {
+    // TODO вынести в атлас (или что-то подобное)
+    const TL_CORNER = 0
+    const TR_CORNER = 2
+    const BL_CORNER = 12
+    const BR_CORNER = 14
+    const T_WALL = 1
+    const L_WALL = 6
+    const R_WALL = 8
+    const B_WALL = 13
+    const COLUMN = 7
+
     this.walls = this.physics.add.staticGroup()
     this.physics.add.collider(this.player, this.walls)
 
-    const offset = TILE_W/2
+    // Часть I
     const bottomCoord = SCREEN.height - TILE_H
     const rightCoord = SCREEN.width - TILE_W
 
     // верхняя и нижняя стены
     for(let i=(SCREEN.width/TILE_W)-2; i > 0; i--) {
-      const x = i * TILE_W + offset
-      this.walls.create(x, offset, "walls", 1)
-      this.walls.create(x, bottomCoord + offset, "walls", 13)
+      const x = i * TILE_W + TILE_OFFSET
+      this.walls.create(x, TILE_OFFSET, "walls", T_WALL)
+      this.walls.create(x, bottomCoord + TILE_OFFSET, "walls", B_WALL)
     }
 
     // левая и правая стены
     for(let i=(SCREEN.height/TILE_H)-2; i > 0; i--) {
-      const y = i * TILE_H + offset
-      this.walls.create(offset, y, "walls", 6)
-      this.walls.create(rightCoord + offset, y, "walls", 8)
+      const y = i * TILE_H + TILE_OFFSET
+      this.walls.create(TILE_OFFSET, y, "walls", L_WALL)
+      this.walls.create(rightCoord + TILE_OFFSET, y, "walls", R_WALL)
     }
 
     // Расставляем углы
-    this.walls.create(offset, offset, "walls", 0)
-    this.walls.create(rightCoord + offset, offset, "walls", 2)
-    this.walls.create(offset, bottomCoord + offset, "walls", 12)
-    this.walls.create(rightCoord + offset, bottomCoord + offset, "walls", 14)
+    this.walls.create(TILE_OFFSET, TILE_OFFSET, "walls", TL_CORNER)
+    this.walls.create(rightCoord + TILE_OFFSET, TILE_OFFSET, "walls", TR_CORNER)
+    this.walls.create(TILE_OFFSET, bottomCoord + TILE_OFFSET, "walls", BL_CORNER)
+    this.walls.create(rightCoord + TILE_OFFSET, bottomCoord + TILE_OFFSET, "walls", BR_CORNER)
+
+    // Часть II
+    const w_count = ((SCREEN.width / TILE_W) - 4) / 2
+    const h_count = ((SCREEN.height / TILE_H) - 4) / 2
+
+    for( let i=0; i < w_count; i++) {
+      const x = TILE_OFFSET + (i+1) * (TILE_W * 2)
+
+      for (let j=0; j < h_count; j++) {
+        const y = TILE_OFFSET + (j+1) * (TILE_H * 2)
+        this.walls.create(x, y, "walls", COLUMN).body.setCircle(TILE_W/2)
+      }
+    }
   }
 
   create() {
     this.player = this.physics.add.sprite(
-      TILE_W*4,
-      TILE_H*8,
+      TILE_W + TILE_OFFSET,
+      TILE_H + TILE_OFFSET,
       "dude"
     )
 
