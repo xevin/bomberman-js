@@ -50,10 +50,10 @@ export class GameScene extends Phaser.Scene {
         { key: "blast", frame: 0 },
         { key: "blast", frame: 3 },
         { key: "blast", frame: 6 },
-        { key: "blast", frame: 3 },
-        { key: "blast", frame: 0 },
+        { key: "blast", frame: 9 },
+        { key: "blast", frame: 12 },
       ],
-      frameRate: 6,
+      frameRate: 10,
       repeat: 0
     })
 
@@ -63,10 +63,10 @@ export class GameScene extends Phaser.Scene {
         { key: "blast", frame: 1 },
         { key: "blast", frame: 4 },
         { key: "blast", frame: 7 },
-        { key: "blast", frame: 4 },
-        { key: "blast", frame: 1 },
+        { key: "blast", frame: 10 },
+        { key: "blast", frame: 13 },
       ],
-      frameRate: 6,
+      frameRate: 10,
       repeat: 0
     })
 
@@ -76,10 +76,10 @@ export class GameScene extends Phaser.Scene {
         { key: "blast", frame: 2 },
         { key: "blast", frame: 5 },
         { key: "blast", frame: 8 },
-        { key: "blast", frame: 5 },
-        { key: "blast", frame: 2 },
+        { key: "blast", frame: 11 },
+        { key: "blast", frame: 14 },
       ],
-      frameRate: 6,
+      frameRate: 10,
       repeat: 0
     })
   }
@@ -153,7 +153,8 @@ export class GameScene extends Phaser.Scene {
     this.player.setCollideWorldBounds(true)
     this.player.setDepth(1)
     this.player.availableBombCount = 2
-    this.player.blastSize = 2 // длина взрыва: счёт от центра (перекрестье)
+    // длина языков взрыва
+    this.player.blastSize = 1
 
     this.bombs = this.physics.add.staticGroup()
 
@@ -199,7 +200,7 @@ export class GameScene extends Phaser.Scene {
       dirs.forEach(dir => {
         const x = position.x + (dir.x * TILE_W * (i))
         const y = position.y + (dir.y * TILE_W * (i))
-        const newBlast = this.physics.add.sprite(x, y)
+        const newBlast = this.physics.add.sprite(x, y, "blast")
 
         if (dir === Phaser.Math.Vector2.UP) {
           newBlast.setRotation(Phaser.Math.DegToRad(270))
@@ -295,7 +296,7 @@ export class GameScene extends Phaser.Scene {
 
     // удаляем старые взрывы
     this.blasts.forEach(blast => {
-      if (time - blast.startTime > 1000) {
+      if (time - blast.startTime > 500) {
         blast.destroy()
       }
     })
