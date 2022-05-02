@@ -91,6 +91,7 @@ export class GameScene extends Phaser.Scene {
 
     this.player.setBounce(0)
     this.player.setCollideWorldBounds(true)
+    this.player.setDepth(1)
     this.player.availableBombCount = 2
     this.player.blastSize = 2 // длина взрыва: счёт от центра (перекрестье)
 
