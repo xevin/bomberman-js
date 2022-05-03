@@ -6,6 +6,7 @@ export class GameScene extends Phaser.Scene {
   player = null
   bombs = null
   walls = null
+  breakableWalls = null
   blasts = []
   playerSpeed = 120
   isHMoves = false // движение только по горизонтали
@@ -82,6 +83,18 @@ export class GameScene extends Phaser.Scene {
       frameRate: 10,
       repeat: 0
     })
+
+    this.anims.create({
+      key: "brick-wall-breaks",
+      frames: [
+        { key: "walls", frame: 5 },
+        { key: "walls", frame: 9 },
+        { key: "walls", frame: 10 },
+        { key: "walls", frame: 11 },
+      ],
+      frameRate: 15,
+      repeat: 0
+    })
   }
 
   drawWalls() {
@@ -99,6 +112,9 @@ export class GameScene extends Phaser.Scene {
 
     this.walls = this.physics.add.staticGroup()
     this.physics.add.collider(this.player, this.walls)
+
+    this.breakableWalls = this.physics.add.staticGroup()
+    this.physics.add.collider(this.player, this.breakableWalls)
 
     // Часть I - стены вокруг уровня
     const bottomCoord = SCREEN.height - TILE_H
@@ -139,7 +155,25 @@ export class GameScene extends Phaser.Scene {
 
     // Часть III - кирпичная кладка
     // TODO генерировать случайное кол-во и случайное расположение кирпичей
-    this.walls.create(TILE_W * 3 + TILE_OFFSET, TILE_W * 4 + TILE_OFFSET, "walls", BRICK_WALL).body.setCircle(TILE_W/2)
+    const brickWallCoordinates = [
+      {
+        x: TILE_W * 3,
+        y: TILE_H * 4
+      },
+      {
+        x: TILE_W * 3,
+        y: TILE_H * 2
+      },
+      {
+        x: TILE_W * 2,
+        y: TILE_H * 3
+      }
+    ]
+
+    brickWallCoordinates.forEach(pos => {
+      this.breakableWalls.create(pos.x + TILE_OFFSET, pos.y + TILE_OFFSET, "walls", BRICK_WALL)
+        .body.setCircle(TILE_W/2)
+    })
   }
 
   create() {
@@ -213,6 +247,7 @@ export class GameScene extends Phaser.Scene {
         newBlast.anims.play(i === size ? "blast-tail" : "blast-body")
         newBlast.startTime = currentTime
         this.physics.add.overlap(this.player, newBlast, this.collidePlayerWithBlast)
+        this.physics.add.overlap(this.breakableWalls, newBlast, this.collideBreakableWallWithBlast)
 
         // навешиваем коллбэк при столкновении взрыва и бомбы
         this.bombs.children.entries.forEach(bomb => {
@@ -226,6 +261,13 @@ export class GameScene extends Phaser.Scene {
 
   collidePlayerWithBlast() {
     console.info("player is dead")
+  }
+
+  collideBreakableWallWithBlast(blast, brickWall) {
+    brickWall.anims.play("brick-wall-breaks")
+    brickWall.on("animationcomplete", () => {
+      brickWall.destroy()
+    })
   }
 
   explodeBomb(bomb, { startTime }) {
