@@ -1,4 +1,5 @@
 import { UI_COLOR } from "./constants"
+import { blinkText } from "./utils"
 export class GameOverScene extends Phaser.Scene {
 
     darkDisplay = null
@@ -38,6 +39,9 @@ export class GameOverScene extends Phaser.Scene {
             align: "center",
             color: UI_COLOR.activeMenuItem
         }).setShadow(2,3,UI_COLOR.textShadow,1,true,true)
+
+        this.pressAnyKeyText.isBlinked = false
+
         this.pressAnyKeyText.setX((480 - this.pressAnyKeyText.width) / 2)
 
         this.input.keyboard.on("keydown", () => {
@@ -46,18 +50,13 @@ export class GameOverScene extends Phaser.Scene {
     }
 
     update(time, delta) {
-        if (this.blinkTimer < 600) {
-            this.blinkTimer += delta
-          } else {
-            this.blinkTimer = 0
-            if (this.isBlinked) {
-              this.pressAnyKeyText.setColor(UI_COLOR.activeMenuItem)
-              this.isBlinked = false
-            } else {
-              this.pressAnyKeyText.setColor(UI_COLOR.inactiveMenuItem)
-              this.isBlinked = true
-            }
-          }
-        }
+      if (this.blinkTimer < 400) {
+        this.blinkTimer += delta
+      }
+        else {
+          this.blinkTimer = 0
+          this.pressAnyKeyText.isBlinked = blinkText(this.pressAnyKeyText, this.pressAnyKeyText.isBlinked)
+      }
+    }
 
 }

@@ -1,3 +1,4 @@
+import { UI_COLOR } from "./constants"
 
 export function isEven(num) {
   return num % 2 === 0
@@ -16,4 +17,14 @@ export function randomTilePosition(maxW, maxH) {
     x: getRandomArbitrary(0, maxW - 1),
     y: getRandomArbitrary(0, maxH - 1),
   }
+}
+
+export function blinkText(text, isBlinked) {
+  if (isBlinked) {
+        text.setColor(UI_COLOR.activeMenuItem)
+        return false
+    } else {
+        text.setColor(UI_COLOR.inactiveMenuItem)
+        return true
+    }
 }
