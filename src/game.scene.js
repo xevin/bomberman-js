@@ -168,6 +168,10 @@ export class GameScene extends Phaser.Scene {
       {
         x: TILE_W * 2,
         y: TILE_H * 3
+      },
+      {
+        x: TILE_W * 3,
+        y: TILE_H * 3
       }
     ]
 
@@ -202,6 +206,21 @@ export class GameScene extends Phaser.Scene {
     this.drawWalls()
   }
 
+  isABombFreePlace(position) {
+    let rect = new Phaser.Geom.Rectangle(position.x, position.y, 4, 4)
+    let result = true
+
+    // проверяем что взрыв упёрся в колонну или стену до отрисовки взрыва
+    this.bombs.children.entries.forEach((wall, idx) => {
+      let int = Phaser.Geom.Intersects.RectangleToRectangle(rect, wall.body)
+      if (int) {
+        result = false
+      }
+    })
+
+    return result
+  }
+
   spawnBomb(placeTime, position) {
     const newBomb = this.bombs.create(
       position.x,
@@ -209,6 +228,7 @@ export class GameScene extends Phaser.Scene {
       "bomb"
     )
     newBomb.anims.play("bomb")
+    newBomb.body.setCircle((TILE_W/2) - 2)
     newBomb.startTime = placeTime
   }
 
@@ -255,7 +275,7 @@ export class GameScene extends Phaser.Scene {
         }
 
         const newBlast = this.physics.add.sprite(x, y, "blast")
-        newBlast.body.setCircle(TILE_W/2)
+        newBlast.body.setCircle((TILE_W/2) - 2)
 
         if (dir === Phaser.Math.Vector2.UP) {
           newBlast.setRotation(Phaser.Math.DegToRad(270))
@@ -355,14 +375,16 @@ export class GameScene extends Phaser.Scene {
     }
 
     if (Phaser.Input.Keyboard.JustDown(this.fireKey)) {
-      if (this.player.availableBombCount) {
+      const bombPlacePosition = {
+        x: Math.floor((this.player.x) / TILE_W) * TILE_W + 16,
+        y: Math.floor((this.player.y) / TILE_W) * TILE_W + 16
+      }
+
+      if (this.player.availableBombCount && this.isABombFreePlace(bombPlacePosition)) {
         // забираем у игрока одну бомбу
         this.player.availableBombCount -= 1
         // и ставим её с округлёнными координатами - для привязки к ближайшему тайлу
-        this.spawnBomb(time, {
-          x: Math.floor((this.player.x) / TILE_W) * TILE_W + 16,
-          y: Math.floor((this.player.y) / TILE_W) * TILE_W + 16
-        })
+        this.spawnBomb(time, bombPlacePosition)
       }
     }
 
