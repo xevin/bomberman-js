@@ -135,6 +135,7 @@ export class GameScene extends Phaser.Scene {
     }
 
     // Расставляем углы
+    // TODO: не использовать физику для изображений угов
     this.walls.create(TILE_OFFSET, TILE_OFFSET, "walls", TL_CORNER)
     this.walls.create(rightCoord + TILE_OFFSET, TILE_OFFSET, "walls", TR_CORNER)
     this.walls.create(TILE_OFFSET, bottomCoord + TILE_OFFSET, "walls", BL_CORNER)
@@ -230,11 +231,31 @@ export class GameScene extends Phaser.Scene {
       Phaser.Math.Vector2.DOWN,
     ]
 
-    for(let i=1; i <= size; i++) {
-      dirs.forEach(dir => {
+    let disabledDirs = [
+    ]
+
+    dirs.forEach(dir => {
+      for(let i=1; i <= size; i++) {
         const x = position.x + (dir.x * TILE_W * (i))
         const y = position.y + (dir.y * TILE_W * (i))
+
+        let rect = new Phaser.Geom.Rectangle(x, y, 4, 4)
+
+        // проверяем что взрыв упёрся в колонну или стену до отрисовки взрыва
+        this.walls.children.entries.forEach((wall, idx) => {
+          let int = Phaser.Geom.Intersects.RectangleToRectangle(rect, wall.body)
+          if (int) {
+            // есть пересечение - отменяем отрисовку взрывов в этом направлении
+            disabledDirs.push(dir)
+          }
+        })
+
+        if (disabledDirs.includes(dir)) {
+          break
+        }
+
         const newBlast = this.physics.add.sprite(x, y, "blast")
+        newBlast.body.setCircle(TILE_W/2)
 
         if (dir === Phaser.Math.Vector2.UP) {
           newBlast.setRotation(Phaser.Math.DegToRad(270))
@@ -255,8 +276,17 @@ export class GameScene extends Phaser.Scene {
         })
 
         this.blasts.push(newBlast)
-      })
-    }
+
+        // проверяем что взрыв пришёлся на кирпичную стену после отрисовки взрыва
+        this.breakableWalls.children.entries.forEach((wall, idx) => {
+          let int = Phaser.Geom.Intersects.RectangleToRectangle(rect, wall.body)
+          if (int) {
+            newBlast.anims.play("blast-tail")
+            disabledDirs.push(dir)
+          }
+        })
+      }
+    })
   }
 
   collidePlayerWithBlast() {
