@@ -1,4 +1,5 @@
 import { TILE_W, TILE_H, FRAME_CONFIG, SCREEN, TILE_OFFSET } from "./constants"
+import { isBothOdd, randomTilePosition } from "./utils"
 
 export class GameScene extends Phaser.Scene {
   fireKey = null
@@ -155,25 +156,33 @@ export class GameScene extends Phaser.Scene {
     }
 
     // Часть III - кирпичная кладка
-    // TODO генерировать случайное кол-во и случайное расположение кирпичей
-    const brickWallCoordinates = [
-      {
-        x: TILE_W * 3,
-        y: TILE_H * 4
-      },
-      {
-        x: TILE_W * 3,
-        y: TILE_H * 2
-      },
-      {
-        x: TILE_W * 2,
-        y: TILE_H * 3
-      },
-      {
-        x: TILE_W * 3,
-        y: TILE_H * 3
+    // Кол-во тайлов по ширине и высоте игрового поля
+    const gameAreaW = 13
+    const gameAreaH = 13
+
+    function randomBrickCoordinate() {
+      let pos = randomTilePosition()
+
+      // когда обе координаты нечётные - в этой позиции стоит колонна (т.е. не подходит для расположения кирпича)
+      // так-же нулевые координаты должны быть пустые для спавна игрока
+      while(isBothOdd(pos) || (pos.x === 0 && pos.y === 0) ) {
+        pos = randomTilePosition(gameAreaW, gameAreaH)
       }
-    ]
+
+      pos.x += 1
+      pos.y += 1
+
+      pos.x *= TILE_W
+      pos.y *= TILE_H
+      return pos
+    }
+
+    let brickWallCoordinates = []
+    const brickCount = 30
+
+    for(let i=0; i < brickCount; i++) {
+      brickWallCoordinates.push(randomBrickCoordinate())
+    }
 
     brickWallCoordinates.forEach(pos => {
       this.breakableWalls.create(pos.x + TILE_OFFSET, pos.y + TILE_OFFSET, "walls", BRICK_WALL)
