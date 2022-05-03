@@ -21,7 +21,7 @@ export class GameScene extends Phaser.Scene {
     this.load.spritesheet("dude", "assets/dude.png", FRAME_CONFIG)
     this.load.spritesheet("bomb", "assets/bomb-frames.png", FRAME_CONFIG)
     this.load.spritesheet("blast", "assets/blast-frames.png", FRAME_CONFIG)
-    this.load.spritesheet("walls", "assets/walls.png", FRAME_CONFIG)
+    this.load.atlas("walls", "assets/walls.png", "assets/walls.json")
   }
 
   createAnimations() {
@@ -88,29 +88,18 @@ export class GameScene extends Phaser.Scene {
     this.anims.create({
       key: "brick-wall-breaks",
       frames: [
-        { key: "walls", frame: 5 },
-        { key: "walls", frame: 9 },
-        { key: "walls", frame: 10 },
-        { key: "walls", frame: 11 },
+        { key: "walls", frame: "broken_brick_01" },
+        { key: "walls", frame: "broken_brick_02" },
+        { key: "walls", frame: "broken_brick_03" },
+        { key: "walls", frame: "broken_brick_04" },
       ],
+      hideOnComplete: true,
       frameRate: 15,
       repeat: 0
     })
   }
 
   drawWalls() {
-    // TODO вынести в атлас (или что-то подобное)
-    const TL_CORNER = 0
-    const TR_CORNER = 2
-    const BL_CORNER = 12
-    const BR_CORNER = 14
-    const T_WALL = 1
-    const L_WALL = 6
-    const R_WALL = 8
-    const B_WALL = 13
-    const COLUMN = 7
-    const BRICK_WALL = 3
-
     this.walls = this.physics.add.staticGroup()
     this.physics.add.collider(this.player, this.walls)
 
@@ -124,23 +113,23 @@ export class GameScene extends Phaser.Scene {
     // верхняя и нижняя стены
     for(let i=(SCREEN.width/TILE_W)-2; i > 0; i--) {
       const x = i * TILE_W + TILE_OFFSET
-      this.walls.create(x, TILE_OFFSET, "walls", T_WALL).setDepth(1)
-      this.walls.create(x, bottomCoord + TILE_OFFSET, "walls", B_WALL).setDepth(1)
+      this.walls.create(x, TILE_OFFSET, "walls", "t_wall").setDepth(1)
+      this.walls.create(x, bottomCoord + TILE_OFFSET, "walls", "b_wall").setDepth(1)
     }
 
     // левая и правая стены
     for(let i=(SCREEN.height/TILE_H)-2; i > 0; i--) {
       const y = i * TILE_H + TILE_OFFSET
-      this.walls.create(TILE_OFFSET, y, "walls", L_WALL).setDepth(1)
-      this.walls.create(rightCoord + TILE_OFFSET, y, "walls", R_WALL).setDepth(1)
+      this.walls.create(TILE_OFFSET, y, "walls", "l_wall").setDepth(1)
+      this.walls.create(rightCoord + TILE_OFFSET, y, "walls", "r_wall").setDepth(1)
     }
 
     // Расставляем углы
     // TODO: не использовать физику для изображений угов
-    this.walls.create(TILE_OFFSET, TILE_OFFSET, "walls", TL_CORNER)
-    this.walls.create(rightCoord + TILE_OFFSET, TILE_OFFSET, "walls", TR_CORNER)
-    this.walls.create(TILE_OFFSET, bottomCoord + TILE_OFFSET, "walls", BL_CORNER)
-    this.walls.create(rightCoord + TILE_OFFSET, bottomCoord + TILE_OFFSET, "walls", BR_CORNER)
+    this.walls.create(TILE_OFFSET, TILE_OFFSET, "walls", "tl_wall")
+    this.walls.create(rightCoord + TILE_OFFSET, TILE_OFFSET, "walls", "tr_wall")
+    this.walls.create(TILE_OFFSET, bottomCoord + TILE_OFFSET, "walls", "bl_wall")
+    this.walls.create(rightCoord + TILE_OFFSET, bottomCoord + TILE_OFFSET, "walls", "br_wall")
 
     // Часть II - нерушимые колонны
     const w_count = ((SCREEN.width / TILE_W) - 4) / 2
@@ -151,7 +140,7 @@ export class GameScene extends Phaser.Scene {
 
       for (let j=0; j < h_count; j++) {
         const y = TILE_OFFSET + (j+1) * (TILE_H * 2)
-        this.walls.create(x, y, "walls", COLUMN).setDepth(1).body.setCircle(TILE_W/2)
+        this.walls.create(x, y, "walls", "column").setDepth(1).body.setCircle(TILE_W/2)
       }
     }
 
@@ -185,7 +174,7 @@ export class GameScene extends Phaser.Scene {
     }
 
     brickWallCoordinates.forEach(pos => {
-      this.breakableWalls.create(pos.x + TILE_OFFSET, pos.y + TILE_OFFSET, "walls", BRICK_WALL)
+      this.breakableWalls.create(pos.x + TILE_OFFSET, pos.y + TILE_OFFSET, "walls", "brick")
         .body.setCircle(TILE_W/2)
     })
   }
