@@ -1,5 +1,5 @@
 import { TILE_W, TILE_H, FRAME_CONFIG, SCREEN, TILE_OFFSET } from "./constants"
-import { isBothOdd, randomTilePosition } from "./utils"
+import { isBothOdd, randomTilePosition, roundPointToTile } from "./utils"
 
 export class GameScene extends Phaser.Scene {
   fireKey = null
@@ -219,26 +219,47 @@ export class GameScene extends Phaser.Scene {
     return result
   }
 
-  spawnBomb(placeTime, position) {
+  spawnBomb(position) {
+    // бомба должна быть размером чем тайл, поэтому уменьшаем её размер на 4 пикселя
+    // так как это радиус, то отнимаем не 4, а 2 пикселя
+    const offset = 2
+    const collideRadius = (TILE_W/2) - offset
+
     const newBomb = this.bombs.create(
       position.x,
       position.y,
       "bomb"
     )
+    newBomb.body.setCircle(collideRadius)
+
+    // что-бы центрировать коллайдер, смещаем его на пару пикселей ниже и правее
+    newBomb.body.position.x += offset
+    newBomb.body.position.y += offset
+
     newBomb.anims.play("bomb")
-    newBomb.body.setCircle((TILE_W/2) - 2)
-    newBomb.startTime = placeTime
+
+    newBomb.on("animationcomplete", () => {
+      this.explodeBomb(newBomb)
+    })
   }
 
-  drawBlast(position, size, currentTime) {
+  drawBlast(position, size) {
+    const positionOffset = 5
+
     const crossBlast = this.physics.add.sprite(
       position.x,
       position.y,
       "blast",
     )
 
-    crossBlast.startTime = currentTime
+    crossBlast.body.setCircle((TILE_W/2) - positionOffset)
+    crossBlast.body.offset.x += positionOffset
+    crossBlast.body.offset.y += positionOffset
     crossBlast.anims.play("blast-cross")
+    crossBlast.on("animationcomplete", () => {
+      crossBlast.destroy()
+    })
+
     this.physics.add.overlap(this.player, crossBlast, this.collidePlayerWithBlast)
     this.blasts.push(crossBlast)
 
@@ -249,8 +270,7 @@ export class GameScene extends Phaser.Scene {
       Phaser.Math.Vector2.DOWN,
     ]
 
-    let disabledDirs = [
-    ]
+    let disabledDirs = []
 
     dirs.forEach(dir => {
       for(let i=1; i <= size; i++) {
@@ -273,7 +293,9 @@ export class GameScene extends Phaser.Scene {
         }
 
         const newBlast = this.physics.add.sprite(x, y, "blast")
-        newBlast.body.setCircle((TILE_W/2) - 2)
+        newBlast.body.setCircle((TILE_W/2) - positionOffset)
+        newBlast.body.offset.x += positionOffset
+        newBlast.body.offset.y += positionOffset
 
         if (dir === Phaser.Math.Vector2.UP) {
           newBlast.setRotation(Phaser.Math.DegToRad(270))
@@ -284,7 +306,11 @@ export class GameScene extends Phaser.Scene {
         }
 
         newBlast.anims.play(i === size ? "blast-tail" : "blast-body")
-        newBlast.startTime = currentTime
+
+        newBlast.on("animationcomplete", () => {
+          newBlast.destroy()
+        })
+
         this.physics.add.overlap(this.player, newBlast, this.collidePlayerWithBlast)
         this.physics.add.overlap(this.breakableWalls, newBlast, this.collideBreakableWallWithBlast)
 
@@ -300,6 +326,7 @@ export class GameScene extends Phaser.Scene {
           let int = Phaser.Geom.Intersects.RectangleToRectangle(rect, wall.body)
           if (int) {
             newBlast.anims.play("blast-tail")
+
             disabledDirs.push(dir)
           }
         })
@@ -318,14 +345,13 @@ export class GameScene extends Phaser.Scene {
     })
   }
 
-  explodeBomb(bomb, { startTime }) {
+  explodeBomb(bomb) {
     this.drawBlast(
       {
         x: bomb.x,
         y: bomb.y
       },
-      this.player.blastSize,
-      startTime
+      this.player.blastSize
     )
 
     // бомба отработала и больше не нужна
@@ -373,31 +399,14 @@ export class GameScene extends Phaser.Scene {
     }
 
     if (Phaser.Input.Keyboard.JustDown(this.fireKey)) {
-      const bombPlacePosition = {
-        x: Math.floor((this.player.x) / TILE_W) * TILE_W + 16,
-        y: Math.floor((this.player.y) / TILE_W) * TILE_W + 16
-      }
+      // позиция с округлёнными до ближайшего тайла координатами
+      const bombPlacePosition = roundPointToTile(this.player)
 
       if (this.player.availableBombCount && this.isABombFreePlace(bombPlacePosition)) {
         // забираем у игрока одну бомбу
         this.player.availableBombCount -= 1
-        // и ставим её с округлёнными координатами - для привязки к ближайшему тайлу
-        this.spawnBomb(time, bombPlacePosition)
+        this.spawnBomb(bombPlacePosition)
       }
     }
-
-    // удаляем старые взрывы
-    this.blasts.forEach(blast => {
-      if (time - blast.startTime > 500) {
-        blast.destroy()
-      }
-    })
-
-    const self = this
-    this.bombs.children.entries.forEach(bomb => {
-      if (time - bomb.startTime > 3000) {
-        self.explodeBomb(bomb, { startTime: time })
-      }
-    })
   }
 }
