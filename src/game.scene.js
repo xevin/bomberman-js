@@ -1,5 +1,5 @@
 import { TILE_W, TILE_H, FRAME_CONFIG, SCREEN, TILE_OFFSET } from "./constants"
-import { isBothOdd, randomTilePosition, roundPointToTile } from "./utils"
+import { isBothOdd, randomTilePosition, fitPointToTile } from "./utils"
 
 export class GameScene extends Phaser.Scene {
   fireKey = null
@@ -8,7 +8,7 @@ export class GameScene extends Phaser.Scene {
   bombs = null
   walls = null
   breakableWalls = null
-  blasts = []
+  blasts = null
   playerSpeed = 120
   isHMoves = false // движение только по горизонтали
   isVMoves = false // движение только по вертикали
@@ -194,6 +194,7 @@ export class GameScene extends Phaser.Scene {
     this.player.blastSize = 1
 
     this.bombs = this.physics.add.staticGroup()
+    this.blasts = this.physics.add.staticGroup()
 
     this.physics.add.collider(this.player, this.bombs)
 
@@ -208,8 +209,7 @@ export class GameScene extends Phaser.Scene {
     let rect = new Phaser.Geom.Rectangle(position.x, position.y, 4, 4)
     let result = true
 
-    // проверяем что взрыв упёрся в колонну или стену до отрисовки взрыва
-    this.bombs.children.entries.forEach((wall, idx) => {
+    this.bombs.children.entries.forEach((wall) => {
       let int = Phaser.Geom.Intersects.RectangleToRectangle(rect, wall.body)
       if (int) {
         result = false
@@ -261,7 +261,7 @@ export class GameScene extends Phaser.Scene {
     })
 
     this.physics.add.overlap(this.player, crossBlast, this.collidePlayerWithBlast)
-    this.blasts.push(crossBlast)
+    this.blasts.create(crossBlast)
 
     const dirs = [
       Phaser.Math.Vector2.LEFT,
@@ -280,7 +280,7 @@ export class GameScene extends Phaser.Scene {
         let rect = new Phaser.Geom.Rectangle(x, y, 4, 4)
 
         // проверяем что взрыв упёрся в колонну или стену до отрисовки взрыва
-        this.walls.children.entries.forEach((wall, idx) => {
+        this.walls.children.entries.forEach((wall) => {
           let int = Phaser.Geom.Intersects.RectangleToRectangle(rect, wall.body)
           if (int) {
             // есть пересечение - отменяем отрисовку взрывов в этом направлении
@@ -319,10 +319,10 @@ export class GameScene extends Phaser.Scene {
           this.physics.add.overlap(bomb, newBlast, this.explodeBomb, () => true, this)
         })
 
-        this.blasts.push(newBlast)
+        this.blasts.create(newBlast)
 
         // проверяем что взрыв пришёлся на кирпичную стену после отрисовки взрыва
-        this.breakableWalls.children.entries.forEach((wall, idx) => {
+        this.breakableWalls.children.entries.forEach((wall) => {
           let int = Phaser.Geom.Intersects.RectangleToRectangle(rect, wall.body)
           if (int) {
             newBlast.anims.play("blast-tail")
@@ -400,7 +400,7 @@ export class GameScene extends Phaser.Scene {
 
     if (Phaser.Input.Keyboard.JustDown(this.fireKey)) {
       // позиция с округлёнными до ближайшего тайла координатами
-      const bombPlacePosition = roundPointToTile(this.player)
+      const bombPlacePosition = fitPointToTile(this.player)
 
       if (this.player.availableBombCount && this.isABombFreePlace(bombPlacePosition)) {
         // забираем у игрока одну бомбу

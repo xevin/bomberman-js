@@ -19,7 +19,7 @@ export function randomTilePosition(maxW, maxH) {
   }
 }
 
-export function roundPointToTile(pos, offset=TILE_OFFSET) {
+export function fitPointToTile(pos, offset=TILE_OFFSET) {
   // округление координат точки (pos) до позиций тайлов
   // pos = { x: number, y: number }
 
