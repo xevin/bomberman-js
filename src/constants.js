@@ -2,9 +2,21 @@ export const TILE_W = 32
 export const TILE_H = 32
 export const TILE_OFFSET = TILE_W/2
 
+export const MAP = {
+  width: 15,
+  height: 15
+}
+
+export const HUD_HEIGHT = (TILE_H + 1) - 1
+
+export const HUD_POS = {
+  x: 0,
+  y: MAP.height * TILE_H
+}
+
 export const SCREEN = {
-  width: TILE_W * 15,
-  height: TILE_H * 15
+  width: TILE_W * MAP.width,
+  height: TILE_H * MAP.height + HUD_HEIGHT
 }
 
 export const FRAME_CONFIG = {

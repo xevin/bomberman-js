@@ -1,4 +1,4 @@
-import { TILE_W, TILE_H, FRAME_CONFIG, SCREEN, TILE_OFFSET } from "./constants"
+import { TILE_W, TILE_H, FRAME_CONFIG, TILE_OFFSET, MAP, HUD_POS, SCREEN, FONT_SIZE, UI_COLOR } from "./constants"
 import { isBothOdd, randomTilePosition, fitPointToTile } from "./utils"
 
 export class GameScene extends Phaser.Scene {
@@ -12,6 +12,8 @@ export class GameScene extends Phaser.Scene {
   playerSpeed = 120
   isHMoves = false // движение только по горизонтали
   isVMoves = false // движение только по вертикали
+  hudBombText = null
+  hudTimeText = null
 
   constructor() {
     super("GameScene")
@@ -21,7 +23,7 @@ export class GameScene extends Phaser.Scene {
     this.load.spritesheet("dude", "assets/dude.png", FRAME_CONFIG)
     this.load.spritesheet("bomb", "assets/bomb-frames.png", FRAME_CONFIG)
     this.load.spritesheet("blast", "assets/blast-frames.png", FRAME_CONFIG)
-    this.load.atlas("walls", "assets/walls.png", "assets/walls.json")
+    this.load.atlas("tiles", "assets/tiles.png", "assets/tiles.json")
   }
 
   createAnimations() {
@@ -89,10 +91,10 @@ export class GameScene extends Phaser.Scene {
     this.anims.create({
       key: "brick-wall-breaks",
       frames: [
-        { key: "walls", frame: "broken_brick_01" },
-        { key: "walls", frame: "broken_brick_02" },
-        { key: "walls", frame: "broken_brick_03" },
-        { key: "walls", frame: "broken_brick_04" },
+        { key: "tiles", frame: "broken_brick_01" },
+        { key: "tiles", frame: "broken_brick_02" },
+        { key: "tiles", frame: "broken_brick_03" },
+        { key: "tiles", frame: "broken_brick_04" },
       ],
       hideOnComplete: true,
       frameRate: 15,
@@ -108,40 +110,40 @@ export class GameScene extends Phaser.Scene {
     this.physics.add.collider(this.player, this.breakableWalls)
 
     // Часть I - стены вокруг уровня
-    const bottomCoord = SCREEN.height - TILE_H
-    const rightCoord = SCREEN.width - TILE_W
+    const bottomCoord = MAP.height * TILE_H - TILE_H
+    const rightCoord = MAP.width * TILE_W - TILE_W
 
     // верхняя и нижняя стены
-    for(let i=(SCREEN.width/TILE_W)-2; i > 0; i--) {
+    for(let i=MAP.width-2; i > 0; i--) {
       const x = i * TILE_W + TILE_OFFSET
-      this.walls.create(x, TILE_OFFSET, "walls", "t_wall").setDepth(1)
-      this.walls.create(x, bottomCoord + TILE_OFFSET, "walls", "b_wall").setDepth(1)
+      this.walls.create(x, TILE_OFFSET, "tiles", "t_wall").setDepth(1)
+      this.walls.create(x, bottomCoord + TILE_OFFSET, "tiles", "b_wall").setDepth(1)
     }
 
     // левая и правая стены
-    for(let i=(SCREEN.height/TILE_H)-2; i > 0; i--) {
+    for(let i=MAP.height-2; i > 0; i--) {
       const y = i * TILE_H + TILE_OFFSET
-      this.walls.create(TILE_OFFSET, y, "walls", "l_wall").setDepth(1)
-      this.walls.create(rightCoord + TILE_OFFSET, y, "walls", "r_wall").setDepth(1)
+      this.walls.create(TILE_OFFSET, y, "tiles", "l_wall").setDepth(1)
+      this.walls.create(rightCoord + TILE_OFFSET, y, "tiles", "r_wall").setDepth(1)
     }
 
     // Расставляем углы
     // TODO: не использовать физику для изображений угов
-    this.walls.create(TILE_OFFSET, TILE_OFFSET, "walls", "tl_wall")
-    this.walls.create(rightCoord + TILE_OFFSET, TILE_OFFSET, "walls", "tr_wall")
-    this.walls.create(TILE_OFFSET, bottomCoord + TILE_OFFSET, "walls", "bl_wall")
-    this.walls.create(rightCoord + TILE_OFFSET, bottomCoord + TILE_OFFSET, "walls", "br_wall")
+    this.walls.create(TILE_OFFSET, TILE_OFFSET, "tiles", "tl_wall")
+    this.walls.create(rightCoord + TILE_OFFSET, TILE_OFFSET, "tiles", "tr_wall")
+    this.walls.create(TILE_OFFSET, bottomCoord + TILE_OFFSET, "tiles", "bl_wall")
+    this.walls.create(rightCoord + TILE_OFFSET, bottomCoord + TILE_OFFSET, "tiles", "br_wall")
 
     // Часть II - нерушимые колонны
-    const w_count = ((SCREEN.width / TILE_W) - 4) / 2
-    const h_count = ((SCREEN.height / TILE_H) - 4) / 2
+    const w_count = (MAP.width - 4) / 2
+    const h_count = (MAP.height - 4) / 2
 
-    for( let i=0; i < w_count; i++) {
+    for(let i=0; i < w_count; i++) {
       const x = TILE_OFFSET + (i+1) * (TILE_W * 2)
 
       for (let j=0; j < h_count; j++) {
         const y = TILE_OFFSET + (j+1) * (TILE_H * 2)
-        this.walls.create(x, y, "walls", "column").setDepth(1).body.setCircle(TILE_W/2)
+        this.walls.create(x, y, "tiles", "column").setDepth(1).body.setCircle(TILE_W/2)
       }
     }
 
@@ -175,9 +177,46 @@ export class GameScene extends Phaser.Scene {
     }
 
     brickWallCoordinates.forEach(pos => {
-      this.breakableWalls.create(pos.x + TILE_OFFSET, pos.y + TILE_OFFSET, "walls", "brick")
+      this.breakableWalls.create(pos.x + TILE_OFFSET, pos.y + TILE_OFFSET, "tiles", "brick")
         .body.setCircle(TILE_W/2)
     })
+  }
+
+  drawHud() {
+    const y = HUD_POS.y + TILE_OFFSET
+    const x = HUD_POS.x + TILE_OFFSET
+    this.add.sprite(x, y, "tiles", "hud_left")
+
+    for(let i=0; i<(SCREEN.width/TILE_W) - 2; i++) {
+      this.add.sprite(x + TILE_W + (i * TILE_W), y, "tiles", "hud_middle")
+    }
+
+    this.add.sprite(SCREEN.width - TILE_W + TILE_OFFSET, y, "tiles", "hud_right")
+
+    this.add.sprite(x, y, "tiles", "hud_timer")
+    this.hudTimeText = this.add.text(x + TILE_OFFSET, y - TILE_OFFSET + 2, "256", {
+      fontSize: FONT_SIZE.normal,
+        fontFamily: "NewGen",
+        color: UI_COLOR.normalText
+    })
+    this.add.sprite(x + TILE_W * 3, y, "tiles", "hud_bomb")
+    this.hudBombText = this.add.text(
+      x + TILE_OFFSET + TILE_W * 3,
+      y - TILE_OFFSET + 2,
+      "1",
+      {
+        fontSize: FONT_SIZE.normal,
+        fontFamily: "NewGen",
+        color: UI_COLOR.normalText
+      }
+    )
+
+    this.updateHudText()
+  }
+
+
+  updateHudText() {
+    this.hudBombText.setText(this.player.availableBombCount)
   }
 
   create() {
@@ -204,6 +243,7 @@ export class GameScene extends Phaser.Scene {
 
     this.createAnimations()
     this.drawWalls()
+    this.drawHud()
   }
 
   isABombFreePlace(position) {
@@ -360,6 +400,7 @@ export class GameScene extends Phaser.Scene {
 
     // возвращаем игроку возможность ставить бомбу
     this.player.availableBombCount += 1
+    this.updateHudText()
   }
 
   update(time, delta) {
@@ -406,6 +447,7 @@ export class GameScene extends Phaser.Scene {
       if (this.player.availableBombCount && this.isABombFreePlace(bombPlacePosition)) {
         // забираем у игрока одну бомбу
         this.player.availableBombCount -= 1
+        this.updateHudText()
         this.spawnBomb(bombPlacePosition)
       }
     }
