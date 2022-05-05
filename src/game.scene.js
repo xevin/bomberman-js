@@ -46,6 +46,7 @@ export class GameScene extends Phaser.Scene {
       repeat: 0
     })
 
+    const blastFrameRate = 25
     this.anims.create({
       key: "blast-cross",
       frames: [
@@ -55,7 +56,7 @@ export class GameScene extends Phaser.Scene {
         { key: "blast", frame: 9 },
         { key: "blast", frame: 12 },
       ],
-      frameRate: 10,
+      frameRate: blastFrameRate,
       repeat: 0
     })
 
@@ -68,7 +69,7 @@ export class GameScene extends Phaser.Scene {
         { key: "blast", frame: 10 },
         { key: "blast", frame: 13 },
       ],
-      frameRate: 10,
+      frameRate: blastFrameRate,
       repeat: 0
     })
 
@@ -81,7 +82,7 @@ export class GameScene extends Phaser.Scene {
         { key: "blast", frame: 11 },
         { key: "blast", frame: 14 },
       ],
-      frameRate: 10,
+      frameRate: blastFrameRate,
       repeat: 0
     })
 
@@ -209,8 +210,8 @@ export class GameScene extends Phaser.Scene {
     let rect = new Phaser.Geom.Rectangle(position.x, position.y, 4, 4)
     let result = true
 
-    this.bombs.children.entries.forEach((wall) => {
-      let int = Phaser.Geom.Intersects.RectangleToRectangle(rect, wall.body)
+    this.bombs.children.entries.forEach((bomb) => {
+      let int = Phaser.Geom.Intersects.RectangleToRectangle(rect, bomb.body)
       if (int) {
         result = false
       }
