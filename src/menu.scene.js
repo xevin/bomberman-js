@@ -26,6 +26,10 @@ export class MenuScene extends Phaser.Scene {
       scene: 'MenuOptionsScene',
       text: 'Опции',
     },
+    {
+      scene: 'GameOverScene',
+      text: 'Конец игры',
+    }
   ]
 
   constructor() {

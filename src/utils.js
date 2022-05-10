@@ -1,4 +1,5 @@
 import { TILE_OFFSET, TILE_W } from "./constants"
+import { UI_COLOR } from "./constants"
 
 export function isEven(num) {
   return num % 2 === 0
@@ -20,11 +21,20 @@ export function randomTilePosition(maxW, maxH) {
 }
 
 export function fitPointToTile(pos, offset=TILE_OFFSET) {
-  // округление координат точки (pos) до позиций тайлов
-  // pos = { x: number, y: number }
+    // округление координат точки (pos) до позиций тайлов
+    // pos = { x: number, y: number }
 
-  return {
-    x: Math.floor((pos.x) / TILE_W) * TILE_W + offset,
-    y: Math.floor((pos.y) / TILE_W) * TILE_W + offset
-  }
+    return {
+        x: Math.floor((pos.x) / TILE_W) * TILE_W + offset,
+        y: Math.floor((pos.y) / TILE_W) * TILE_W + offset
+    }
+}
+export function blinkText(text, isBlinked) {
+  if (isBlinked) {
+        text.setColor(UI_COLOR.activeMenuItem)
+        return false
+    } else {
+        text.setColor(UI_COLOR.inactiveMenuItem)
+        return true
+    }
 }

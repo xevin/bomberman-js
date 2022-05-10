@@ -1,9 +1,9 @@
 import { FONT_SIZE, UI_COLOR } from "./constants"
+import { blinkText } from "./utils"
 
 export class IntroScene extends Phaser.Scene {
   pressAnyKeyText = null
   blinkTimer = 0
-  isBlinked = false
 
   constructor() {
     super("IntroScene")
@@ -28,6 +28,8 @@ export class IntroScene extends Phaser.Scene {
       color: UI_COLOR.activeMenuItem
     }).setShadow(2,3,UI_COLOR.textShadow,1,true,true)
 
+    this.pressAnyKeyText.isBlinked = false
+
     this.input.keyboard.on("keyup", () => {
       this.scene.start("MenuScene")
     })
@@ -36,15 +38,10 @@ export class IntroScene extends Phaser.Scene {
   update(time, delta) {
     if (this.blinkTimer < 600) {
       this.blinkTimer += delta
-    } else {
-      this.blinkTimer = 0
-      if (this.isBlinked) {
-        this.pressAnyKeyText.setColor(UI_COLOR.activeMenuItem)
-        this.isBlinked = false
-      } else {
-        this.pressAnyKeyText.setColor(UI_COLOR.inactiveMenuItem)
-        this.isBlinked = true
-      }
+    }
+      else {
+        this.blinkTimer = 0
+        this.isBlinked = blinkText(this.pressAnyKeyText, this.isBlinked)
     }
   }
 }
