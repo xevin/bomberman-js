@@ -1,5 +1,17 @@
-import { TILE_W, TILE_H, FRAME_CONFIG, TILE_OFFSET, MAP, HUD_POS, SCREEN, FONT_SIZE, UI_COLOR } from "./constants"
-import { isBothOdd, randomTilePosition, fitPointToTile } from "./utils"
+import {
+  TILE_W,
+  TILE_H,
+  FRAME_CONFIG,
+  TILE_OFFSET,
+  MAP,
+  HUD_POS,
+  SCREEN,
+  FONT_SIZE,
+  UI_COLOR,
+  BLINK_SPEED
+} from "./constants"
+import {isBothOdd, randomTilePosition, fitPointToTile, blinkText} from "./utils"
+import {showGameOverScreen} from './game-over-screen'
 
 export class GameScene extends Phaser.Scene {
   fireKey = null
@@ -14,7 +26,7 @@ export class GameScene extends Phaser.Scene {
   isVMoves = false // движение только по вертикали
   hudBombText = null
   hudTimeText = null
-  blackDisplay = null
+  points = 999
 
   constructor() {
     super("GameScene")
@@ -245,6 +257,7 @@ export class GameScene extends Phaser.Scene {
 
     this.cursors = this.input.keyboard.createCursorKeys()
     this.fireKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE)
+    this.endgame = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.TAB)
 
     this.createAnimations()
     this.drawWalls()
@@ -445,6 +458,11 @@ export class GameScene extends Phaser.Scene {
       }
     }
 
+    if (Phaser.Input.Keyboard.JustDown(this.endgame)) {
+      showGameOverScreen(this)
+      console.log(this)
+    }
+
     if (Phaser.Input.Keyboard.JustDown(this.fireKey)) {
       // позиция с округлёнными до ближайшего тайла координатами
       const bombPlacePosition = fitPointToTile(this.player)
@@ -455,6 +473,9 @@ export class GameScene extends Phaser.Scene {
         this.updateHudText()
         this.spawnBomb(bombPlacePosition)
       }
+    }
+    if (this?.pressAnyKeyText) {
+      blinkText(this.pressAnyKeyText, BLINK_SPEED.medium, this.pressAnyKeyText.isBlinked, delta, UI_COLOR.activeMenuItem, UI_COLOR.inactiveMenuItem)
     }
   }
 }
