@@ -14,6 +14,7 @@ export class GameScene extends Phaser.Scene {
   isVMoves = false // движение только по вертикали
   hudBombText = null
   hudTimeText = null
+  blackDisplay = null
 
   constructor() {
     super("GameScene")
@@ -182,6 +183,10 @@ export class GameScene extends Phaser.Scene {
     })
   }
 
+  viewGameOver() {
+
+  }
+
   drawHud() {
     const y = HUD_POS.y + TILE_OFFSET
     const x = HUD_POS.x + TILE_OFFSET
@@ -225,7 +230,7 @@ export class GameScene extends Phaser.Scene {
       TILE_H + TILE_OFFSET,
       "dude"
     )
-
+        
     this.player.setBounce(0)
     this.player.setCollideWorldBounds(true)
     this.player.setDepth(1)
