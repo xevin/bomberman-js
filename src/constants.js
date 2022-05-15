@@ -38,3 +38,9 @@ export const UI_COLOR = {
   textShadow: "#1E1E1E",
   background: "#43434F"
 }
+
+export const BLINK_SPEED = {
+  slow: 900,
+  medium: 600,
+  turbo: 100,
+}

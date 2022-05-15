@@ -1,4 +1,4 @@
-import { TILE_OFFSET, TILE_W } from "./constants"
+import {BLINK_SPEED, TILE_OFFSET, TILE_W} from "./constants"
 import { UI_COLOR } from "./constants"
 
 export function isEven(num) {
@@ -29,12 +29,20 @@ export function fitPointToTile(pos, offset=TILE_OFFSET) {
         y: Math.floor((pos.y) / TILE_W) * TILE_W + offset
     }
 }
-export function blinkText(text, isBlinked) {
-  if (isBlinked) {
-        text.setColor(UI_COLOR.activeMenuItem)
-        return false
+export function blinkText(text, blinkSpeed, isBlinked, delta, firstColor, secondColor) {
+
+    if (text.blinkSpeed < blinkSpeed) {
+        text.blinkSpeed += delta
     } else {
-        text.setColor(UI_COLOR.inactiveMenuItem)
-        return true
+        text.blinkSpeed = 0
+
+        if (isBlinked) {
+            text.setColor(firstColor)
+            text.isBlinked = false
+            return
+        }
+        text.setColor(secondColor)
+        text.isBlinked = true
     }
+
 }

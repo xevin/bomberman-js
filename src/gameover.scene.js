@@ -4,8 +4,7 @@ export class GameOverScene extends Phaser.Scene {
 
     darkDisplay = null
     pressAnyKeyText = null
-    points = 300
-    blinkTimer = 0
+    points = null
 
     constructor() {
         super("GameOverScene")
@@ -39,7 +38,7 @@ export class GameOverScene extends Phaser.Scene {
             align: "center",
             color: UI_COLOR.activeMenuItem
         }).setShadow(2,3,UI_COLOR.textShadow,1,true,true)
-
+        this.pressAnyKeyText.blinkTimer = 0
         this.pressAnyKeyText.isBlinked = false
 
         this.pressAnyKeyText.setX((480 - this.pressAnyKeyText.width) / 2)
@@ -50,12 +49,12 @@ export class GameOverScene extends Phaser.Scene {
     }
 
     update(time, delta) {
-      if (this.blinkTimer < 400) {
-        this.blinkTimer += delta
+      if (this.pressAnyKeyText.blinkTimer < 400) {
+        this.pressAnyKeyText.blinkTimer += delta
       }
         else {
-          this.blinkTimer = 0
-          this.pressAnyKeyText.isBlinked = blinkText(this.pressAnyKeyText, this.pressAnyKeyText.isBlinked)
+          this.pressAnyKeyText.blinkTimer = 0
+          this.pressAnyKeyText.isBlinked = blinkText(this.pressAnyKeyText, this.pressAnyKeyText.isBlinked, UI_COLOR.inactiveMenuItem, UI_COLOR.activeMenuItem)
       }
     }
 
