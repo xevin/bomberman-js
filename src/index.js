@@ -16,7 +16,6 @@ let config = {
     MenuScene,
     MenuOptionsScene,
     GameScene,
-    GameOverScene,
   ],
   backgroundColor: UI_COLOR.background,
   physics: {
