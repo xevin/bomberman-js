@@ -4,7 +4,6 @@ import { IntroScene } from "./intro.scene"
 import { GameScene } from "./game.scene"
 import { MenuScene } from "./menu.scene"
 import { MenuOptionsScene } from "./menu-options.scene"
-import { GameOverScene } from "./gameover.scene"
 
 
 let config = {
