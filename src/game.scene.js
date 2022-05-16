@@ -460,7 +460,6 @@ export class GameScene extends Phaser.Scene {
 
     if (Phaser.Input.Keyboard.JustDown(this.endgame)) {
       showGameOverScreen(this)
-      console.log(this)
     }
 
     if (Phaser.Input.Keyboard.JustDown(this.fireKey)) {
