@@ -1,6 +1,6 @@
 export const TILE_W = 32
 export const TILE_H = 32
-export const TILE_OFFSET = TILE_W/2
+export const TILE_OFFSET = TILE_W / 2
 
 export const MAP = {
   width: 15,

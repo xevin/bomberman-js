@@ -1,4 +1,4 @@
-import {BLINK_SPEED, FONT_SIZE, UI_COLOR} from "./constants"
+import { BLINK_SPEED, FONT_SIZE, UI_COLOR } from "./constants"
 import { blinkText } from "./utils"
 
 export class IntroScene extends Phaser.Scene {
@@ -14,7 +14,7 @@ export class IntroScene extends Phaser.Scene {
   }
 
   create() {
-    this.add.sprite(240, 344,"intro").setScale(3)
+    this.add.sprite(240, 344, "intro").setScale(3)
     this.add.text(142, 50, "Бомбические\nподземелья", {
       fontSize: FONT_SIZE.big,
       fontFamily: "NewGen",
@@ -26,7 +26,7 @@ export class IntroScene extends Phaser.Scene {
       fontSize: FONT_SIZE.normal,
       fontFamily: "NewGen",
       color: UI_COLOR.activeMenuItem
-    }).setShadow(2,3,UI_COLOR.textShadow,1,true,true)
+    }).setShadow(2, 3, UI_COLOR.textShadow, 1, true, true)
     this.pressAnyKeyText.isBlinked = false
     this.pressAnyKeyText.blinkSpeed = 0
 
@@ -36,6 +36,6 @@ export class IntroScene extends Phaser.Scene {
   }
 
   update(time, delta) {
-    blinkText(this.pressAnyKeyText, BLINK_SPEED.medium, this.pressAnyKeyText.isBlinked, delta,  UI_COLOR.activeMenuItem, UI_COLOR.inactiveMenuItem)
+    blinkText(this.pressAnyKeyText, BLINK_SPEED.medium, this.pressAnyKeyText.isBlinked, delta, UI_COLOR.activeMenuItem, UI_COLOR.inactiveMenuItem)
   }
 }

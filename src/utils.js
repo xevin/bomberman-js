@@ -1,4 +1,4 @@
-import {BLINK_SPEED, TILE_OFFSET, TILE_W} from "./constants"
+import { BLINK_SPEED, TILE_OFFSET, TILE_W } from "./constants"
 import { UI_COLOR } from "./constants"
 
 export function isEven(num) {
@@ -20,29 +20,30 @@ export function randomTilePosition(maxW, maxH) {
   }
 }
 
-export function fitPointToTile(pos, offset=TILE_OFFSET) {
-    // округление координат точки (pos) до позиций тайлов
-    // pos = { x: number, y: number }
+export function fitPointToTile(pos, offset = TILE_OFFSET) {
+  // округление координат точки (pos) до позиций тайлов
+  // pos = { x: number, y: number }
 
-    return {
-        x: Math.floor((pos.x) / TILE_W) * TILE_W + offset,
-        y: Math.floor((pos.y) / TILE_W) * TILE_W + offset
-    }
+  return {
+    x: Math.floor((pos.x) / TILE_W) * TILE_W + offset,
+    y: Math.floor((pos.y) / TILE_W) * TILE_W + offset
+  }
 }
+
 export function blinkText(text, blinkSpeed, isBlinked, delta, firstColor, secondColor) {
 
-    if (text.blinkSpeed < blinkSpeed) {
-        text.blinkSpeed += delta
-    } else {
-        text.blinkSpeed = 0
+  if (text.blinkSpeed < blinkSpeed) {
+    text.blinkSpeed += delta
+  } else {
+    text.blinkSpeed = 0
 
-        if (isBlinked) {
-            text.setColor(firstColor)
-            text.isBlinked = false
-            return
-        }
-        text.setColor(secondColor)
-        text.isBlinked = true
+    if (isBlinked) {
+      text.setColor(firstColor)
+      text.isBlinked = false
+      return
     }
+    text.setColor(secondColor)
+    text.isBlinked = true
+  }
 
 }
