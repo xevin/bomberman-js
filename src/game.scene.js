@@ -10,8 +10,7 @@ import {
   UI_COLOR,
   BLINK_SPEED
 } from "./constants"
-import { isBothOdd, randomTilePosition, fitPointToTile, blinkText } from "./utils"
-import { showGameOverScreen } from './game-over-screen'
+import { isBothOdd, randomTilePosition, fitPointToTile } from "./utils"
 
 export class GameScene extends Phaser.Scene {
   fireKey = null
@@ -455,7 +454,9 @@ export class GameScene extends Phaser.Scene {
     }
 
     if (Phaser.Input.Keyboard.JustDown(this.endgame)) {
-      showGameOverScreen(this)
+      this.input.keyboard.removeAllKeys()
+      this.scene.resume("GameOver")
+      this.scene.setVisible(true, 'GameOver')
     }
 
     if (Phaser.Input.Keyboard.JustDown(this.fireKey)) {
@@ -468,9 +469,6 @@ export class GameScene extends Phaser.Scene {
         this.updateHudText()
         this.spawnBomb(bombPlacePosition)
       }
-    }
-    if (this?.pressAnyKeyText) {
-      blinkText(this.pressAnyKeyText, BLINK_SPEED.medium, this.pressAnyKeyText.isBlinked, delta, UI_COLOR.activeMenuItem, UI_COLOR.inactiveMenuItem)
     }
   }
 }
