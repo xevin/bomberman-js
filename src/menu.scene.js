@@ -1,9 +1,12 @@
-import { FRAME_CONFIG, UI_COLOR } from "./constants"
+import { BLINK_SPEED, FRAME_CONFIG, UI_COLOR } from "./constants"
+import { blinkText } from './utils'
 
 export class MenuScene extends Phaser.Scene {
 
+  i = 0
   arrow = null
   currentItemIndex = 0
+  selected = false
 
   config = {
     startX: 160,
@@ -39,28 +42,37 @@ export class MenuScene extends Phaser.Scene {
   createAnimations() {
     this.anims.create({
       key: "arrow",
-      frames: this.anims.generateFrameNumbers("menu-arrow", {start: 0, end: 3}),
-      frameRate: 12,
-        repeat: -1
+      frames: this.anims.generateFrameNumbers("menu-arrow", {start: 0, end: 8}),
+      frameRate: 15,
+      repeat: -1
     })
-    }
+  }
 
   create() {
     this.arrow = this.physics.add.sprite(
-        this.config.startX - 40,
-        this.config.startY,
-        "menu-arrow"
+      this.config.startX - 40,
+      this.config.startY,
+      "menu-arrow"
     )
-    //* вывожу пункты меню в сцену
-    this.menuItems.forEach( (item, index) => {
+    //* вывожу пункты меню в сцену, добавляю параметры
+    this.menuItems.forEach((item, index) => {
       item.textObj = this.add.text(this.config.startX, index ? this.config.lastY + this.config.incrementY : this.config.startY, item.text, this.config.style)
-      item.textObj.setShadow(2,3,UI_COLOR.textShadow,1,true,true)
+      item.textObj.setShadow(2, 3, UI_COLOR.textShadow, 1, true, true)
+      item.textObj.isBlinked = false
+      item.textObj.blinkSpeed = 0
       this.config.lastY = item.textObj.y
-
     })
 
     this.input.keyboard.on('keydown-ENTER', () => {
-      this.scene.start(this.menuItems[this.currentItemIndex].scene)
+      this.input.keyboard.removeAllListeners() //исключаю нажатие клавиш после запуска пункта из меню
+      this.selected = true
+
+      //Анимация выбора меню с задержкой
+      setTimeout(() => {
+        this.scene.start(this.menuItems[this.currentItemIndex].scene)
+        this.scene.launch("GameOver")
+        this.selected = false
+      }, 600)
     })
 
     this.input.keyboard.on('keydown-UP', () => {
@@ -76,5 +88,9 @@ export class MenuScene extends Phaser.Scene {
   update(time, delta) {
     this.arrow.anims.play("arrow", true)
     this.arrow.setY(this.menuItems[this.currentItemIndex].textObj.y + 15)
+
+    if (this.selected) {
+      blinkText(this.menuItems[this.currentItemIndex].textObj, BLINK_SPEED.turbo, this.menuItems[this.currentItemIndex].textObj.isBlinked, delta, UI_COLOR.activeMenuItem, UI_COLOR.inactiveMenuItem)
+    }
   }
 }

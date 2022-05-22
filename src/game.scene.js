@@ -1,4 +1,15 @@
-import { TILE_W, TILE_H, FRAME_CONFIG, TILE_OFFSET, MAP, HUD_POS, SCREEN, FONT_SIZE, UI_COLOR } from "./constants"
+import {
+  TILE_W,
+  TILE_H,
+  FRAME_CONFIG,
+  TILE_OFFSET,
+  MAP,
+  HUD_POS,
+  SCREEN,
+  FONT_SIZE,
+  UI_COLOR,
+  BLINK_SPEED
+} from "./constants"
 import { isBothOdd, randomTilePosition, fitPointToTile } from "./utils"
 
 export class GameScene extends Phaser.Scene {
@@ -14,6 +25,7 @@ export class GameScene extends Phaser.Scene {
   isVMoves = false // движение только по вертикали
   hudBombText = null
   hudTimeText = null
+  points = 999
 
   constructor() {
     super("GameScene")
@@ -52,11 +64,11 @@ export class GameScene extends Phaser.Scene {
     this.anims.create({
       key: "blast-cross",
       frames: [
-        { key: "blast", frame: 0 },
-        { key: "blast", frame: 3 },
-        { key: "blast", frame: 6 },
-        { key: "blast", frame: 9 },
-        { key: "blast", frame: 12 },
+        {key: "blast", frame: 0},
+        {key: "blast", frame: 3},
+        {key: "blast", frame: 6},
+        {key: "blast", frame: 9},
+        {key: "blast", frame: 12},
       ],
       frameRate: blastFrameRate,
       repeat: 0
@@ -65,11 +77,11 @@ export class GameScene extends Phaser.Scene {
     this.anims.create({
       key: "blast-body",
       frames: [
-        { key: "blast", frame: 1 },
-        { key: "blast", frame: 4 },
-        { key: "blast", frame: 7 },
-        { key: "blast", frame: 10 },
-        { key: "blast", frame: 13 },
+        {key: "blast", frame: 1},
+        {key: "blast", frame: 4},
+        {key: "blast", frame: 7},
+        {key: "blast", frame: 10},
+        {key: "blast", frame: 13},
       ],
       frameRate: blastFrameRate,
       repeat: 0
@@ -78,11 +90,11 @@ export class GameScene extends Phaser.Scene {
     this.anims.create({
       key: "blast-tail",
       frames: [
-        { key: "blast", frame: 2 },
-        { key: "blast", frame: 5 },
-        { key: "blast", frame: 8 },
-        { key: "blast", frame: 11 },
-        { key: "blast", frame: 14 },
+        {key: "blast", frame: 2},
+        {key: "blast", frame: 5},
+        {key: "blast", frame: 8},
+        {key: "blast", frame: 11},
+        {key: "blast", frame: 14},
       ],
       frameRate: blastFrameRate,
       repeat: 0
@@ -91,10 +103,10 @@ export class GameScene extends Phaser.Scene {
     this.anims.create({
       key: "brick-wall-breaks",
       frames: [
-        { key: "tiles", frame: "broken_brick_01" },
-        { key: "tiles", frame: "broken_brick_02" },
-        { key: "tiles", frame: "broken_brick_03" },
-        { key: "tiles", frame: "broken_brick_04" },
+        {key: "tiles", frame: "broken_brick_01"},
+        {key: "tiles", frame: "broken_brick_02"},
+        {key: "tiles", frame: "broken_brick_03"},
+        {key: "tiles", frame: "broken_brick_04"},
       ],
       hideOnComplete: true,
       frameRate: 15,
@@ -114,14 +126,14 @@ export class GameScene extends Phaser.Scene {
     const rightCoord = MAP.width * TILE_W - TILE_W
 
     // верхняя и нижняя стены
-    for(let i=MAP.width-2; i > 0; i--) {
+    for (let i = MAP.width - 2; i > 0; i--) {
       const x = i * TILE_W + TILE_OFFSET
       this.walls.create(x, TILE_OFFSET, "tiles", "t_wall").setDepth(1)
       this.walls.create(x, bottomCoord + TILE_OFFSET, "tiles", "b_wall").setDepth(1)
     }
 
     // левая и правая стены
-    for(let i=MAP.height-2; i > 0; i--) {
+    for (let i = MAP.height - 2; i > 0; i--) {
       const y = i * TILE_H + TILE_OFFSET
       this.walls.create(TILE_OFFSET, y, "tiles", "l_wall").setDepth(1)
       this.walls.create(rightCoord + TILE_OFFSET, y, "tiles", "r_wall").setDepth(1)
@@ -138,12 +150,12 @@ export class GameScene extends Phaser.Scene {
     const w_count = (MAP.width - 4) / 2
     const h_count = (MAP.height - 4) / 2
 
-    for(let i=0; i < w_count; i++) {
-      const x = TILE_OFFSET + (i+1) * (TILE_W * 2)
+    for (let i = 0; i < w_count; i++) {
+      const x = TILE_OFFSET + (i + 1) * (TILE_W * 2)
 
-      for (let j=0; j < h_count; j++) {
-        const y = TILE_OFFSET + (j+1) * (TILE_H * 2)
-        this.walls.create(x, y, "tiles", "column").setDepth(1).body.setCircle(TILE_W/2)
+      for (let j = 0; j < h_count; j++) {
+        const y = TILE_OFFSET + (j + 1) * (TILE_H * 2)
+        this.walls.create(x, y, "tiles", "column").setDepth(1).body.setCircle(TILE_W / 2)
       }
     }
 
@@ -157,7 +169,7 @@ export class GameScene extends Phaser.Scene {
 
       // когда обе координаты нечётные - в этой позиции стоит колонна (т.е. не подходит для расположения кирпича)
       // так-же нулевые координаты должны быть пустые для спавна игрока
-      while(isBothOdd(pos) || (pos.x === 0 && pos.y === 0) ) {
+      while (isBothOdd(pos) || (pos.x === 0 && pos.y === 0)) {
         pos = randomTilePosition(gameAreaW, gameAreaH)
       }
 
@@ -172,13 +184,13 @@ export class GameScene extends Phaser.Scene {
     let brickWallCoordinates = []
     const brickCount = 30
 
-    for(let i=0; i < brickCount; i++) {
+    for (let i = 0; i < brickCount; i++) {
       brickWallCoordinates.push(randomBrickCoordinate())
     }
 
     brickWallCoordinates.forEach(pos => {
       this.breakableWalls.create(pos.x + TILE_OFFSET, pos.y + TILE_OFFSET, "tiles", "brick")
-        .body.setCircle(TILE_W/2)
+        .body.setCircle(TILE_W / 2)
     })
   }
 
@@ -187,7 +199,7 @@ export class GameScene extends Phaser.Scene {
     const x = HUD_POS.x + TILE_OFFSET
     this.add.sprite(x, y, "tiles", "hud_left")
 
-    for(let i=0; i<(SCREEN.width/TILE_W) - 2; i++) {
+    for (let i = 0; i < (SCREEN.width / TILE_W) - 2; i++) {
       this.add.sprite(x + TILE_W + (i * TILE_W), y, "tiles", "hud_middle")
     }
 
@@ -196,8 +208,8 @@ export class GameScene extends Phaser.Scene {
     this.add.sprite(x, y, "tiles", "hud_timer")
     this.hudTimeText = this.add.text(x + TILE_OFFSET, y - TILE_OFFSET + 2, "256", {
       fontSize: FONT_SIZE.normal,
-        fontFamily: "NewGen",
-        color: UI_COLOR.normalText
+      fontFamily: "NewGen",
+      color: UI_COLOR.normalText
     })
     this.add.sprite(x + TILE_W * 3, y, "tiles", "hud_bomb")
     this.hudBombText = this.add.text(
@@ -240,6 +252,7 @@ export class GameScene extends Phaser.Scene {
 
     this.cursors = this.input.keyboard.createCursorKeys()
     this.fireKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE)
+    this.endgame = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.TAB)
 
     this.createAnimations()
     this.drawWalls()
@@ -264,7 +277,7 @@ export class GameScene extends Phaser.Scene {
     // бомба должна быть размером чем тайл, поэтому уменьшаем её размер на 4 пикселя
     // так как это радиус, то отнимаем не 4, а 2 пикселя
     const offset = 2
-    const collideRadius = (TILE_W/2) - offset
+    const collideRadius = (TILE_W / 2) - offset
 
     const newBomb = this.bombs.create(
       position.x,
@@ -293,7 +306,7 @@ export class GameScene extends Phaser.Scene {
       "blast",
     )
 
-    crossBlast.body.setCircle((TILE_W/2) - positionOffset)
+    crossBlast.body.setCircle((TILE_W / 2) - positionOffset)
     crossBlast.body.offset.x += positionOffset
     crossBlast.body.offset.y += positionOffset
     crossBlast.anims.play("blast-cross")
@@ -314,7 +327,7 @@ export class GameScene extends Phaser.Scene {
     let disabledDirs = []
 
     dirs.forEach(dir => {
-      for(let i=1; i <= size; i++) {
+      for (let i = 1; i <= size; i++) {
         const x = position.x + (dir.x * TILE_W * (i))
         const y = position.y + (dir.y * TILE_W * (i))
 
@@ -334,7 +347,7 @@ export class GameScene extends Phaser.Scene {
         }
 
         const newBlast = this.physics.add.sprite(x, y, "blast")
-        newBlast.body.setCircle((TILE_W/2) - positionOffset)
+        newBlast.body.setCircle((TILE_W / 2) - positionOffset)
         newBlast.body.offset.x += positionOffset
         newBlast.body.offset.y += positionOffset
 
@@ -438,6 +451,12 @@ export class GameScene extends Phaser.Scene {
         this.isVMoves = false
         this.player.setVelocityY(0)
       }
+    }
+
+    if (Phaser.Input.Keyboard.JustDown(this.endgame)) {
+      this.input.keyboard.removeAllKeys()
+      this.scene.setVisible(true, "GameOver")
+      this.scene.resume("GameOver")
     }
 
     if (Phaser.Input.Keyboard.JustDown(this.fireKey)) {

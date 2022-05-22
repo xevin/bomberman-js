@@ -1,6 +1,6 @@
 export const TILE_W = 32
 export const TILE_H = 32
-export const TILE_OFFSET = TILE_W/2
+export const TILE_OFFSET = TILE_W / 2
 
 export const MAP = {
   width: 15,
@@ -37,4 +37,10 @@ export const UI_COLOR = {
   activeMenuItem: "#CFFF70",
   textShadow: "#1E1E1E",
   background: "#43434F"
+}
+
+export const BLINK_SPEED = {
+  slow: 900,
+  medium: 600,
+  turbo: 100,
 }
