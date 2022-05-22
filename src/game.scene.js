@@ -455,8 +455,8 @@ export class GameScene extends Phaser.Scene {
 
     if (Phaser.Input.Keyboard.JustDown(this.endgame)) {
       this.input.keyboard.removeAllKeys()
+      this.scene.setVisible(true, "GameOver")
       this.scene.resume("GameOver")
-      this.scene.setVisible(true, 'GameOver')
     }
 
     if (Phaser.Input.Keyboard.JustDown(this.fireKey)) {

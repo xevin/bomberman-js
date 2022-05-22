@@ -18,10 +18,9 @@ export class GameOverScene extends Phaser.Scene {
       active: true
     })
   }
-
-  create() {
+  preload() {
     this.scene.setVisible(false)
-    this.scene.pause()
+    this.scene.pause()   
 
     this.darkDisplay = this.add.rectangle(0, 0, SCREEN.width, SCREEN.height, 0, 0.8)
     this.darkDisplay.setScale(3)
@@ -55,10 +54,12 @@ export class GameOverScene extends Phaser.Scene {
     this.pressAnyKeyText.setDepth(101)
     this.pressAnyKeyText.setX((480 - this.pressAnyKeyText.width) / 2)
 
+  }
+
+  create() {
     this.input.keyboard.on("keydown", () => {
       this.scene.stop("GameScene")
       this.scene.start("MenuScene")
-      console.log(this);
     })
   }
 

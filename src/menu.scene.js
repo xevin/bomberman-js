@@ -64,10 +64,13 @@ export class MenuScene extends Phaser.Scene {
     })
 
     this.input.keyboard.on('keydown-ENTER', () => {
+      this.input.keyboard.removeAllListeners() //исключаю нажатие клавиш после запуска пункта из меню
       this.selected = true
+
       //Анимация выбора меню с задержкой
       setTimeout(() => {
         this.scene.start(this.menuItems[this.currentItemIndex].scene)
+        this.scene.launch("GameOver")
         this.selected = false
       }, 600)
     })
